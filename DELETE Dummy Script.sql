@@ -1,0 +1,9 @@
+DELETE FROM clean_squat.user;
+DELETE FROM clean_squat.building;
+DELETE FROM clean_squat.session;
+DELETE FROM clean_squat.restroom;
+DELETE FROM clean_squat.admin_edit_building;
+DELETE FROM clean_squat.admin_edit_restroom;
+DELETE FROM clean_squat.manipulate;
+DELETE FROM clean_squat.rating;
+DELETE FROM clean_squat.issuereport;

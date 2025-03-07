@@ -1,9 +1,9 @@
-INSERT INTO clean_squat.user ( Username, Firstname, Lastname, Role) VALUES
-('WellDigger', 'Charles', 'Well', 'USER'),
-('Roshi', 'Mark' , 'Johnson' , 'ADMIN'),
-('Goku' , 'Rachel' , 'Brown' , 'STAFF'), 
-('Broly', 'Karen' , 'Stevenson' , 'ADMIN'),
-('MikeW', 'Pat' , 'Hall' , 'USER');
+INSERT INTO clean_squat.user ( Username,Password, Firstname, Lastname, Role) VALUES
+('WellDigger', '184639060634', 'Charles', 'Well', 'USER'),
+('Roshi', '384639287175', 'Mark' , 'Johnson' , 'ADMIN'),
+('Goku' , '475934738976', 'Rachel' , 'Brown' , 'STAFF'), 
+('Broly', '111111111111', 'Karen' , 'Stevenson' , 'ADMIN'),
+('MikeW', '012345678910', 'Pat' , 'Hall' , 'USER');
 
 INSERT INTO clean_squat.building (BuildingName) VALUES 
 ('Jesse Knight'), 

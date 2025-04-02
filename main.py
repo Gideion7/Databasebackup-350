@@ -72,6 +72,11 @@ def rating():
     #items = get_all_items() # Call defined function to get all items
     return render_template("rating.html")  # , items=items add this line when you have things jinga2 needs to display Return the page to be rendered
 
+@app.route("/issue_report", methods=["GET"])
+def issue_report():
+    #items = get_all_items() # Call defined function to get all items
+    return render_template("issue_report.html")  # , items=items add this line when you have things jinga2 needs to display Return the page to be rendered
+
 
 # EXAMPLE OF POST REQUEST
 @app.route("/new-item", methods=["POST"])

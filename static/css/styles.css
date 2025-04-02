@@ -1,0 +1,70 @@
+/* Style for the entire body and background */
+body {
+    background-color: #002e5d; /* Dark blue background for the page */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+  }
+  
+  /* Center the form container, with dark blue background, padding, and other styles */
+  .form-container {
+    background-color: #003366; /* Dark blue background for the form */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: left; /* Align form fields to the left */
+    color: white; /* White text color */
+  }
+  
+  /* Center the heading and set it to white */
+  h1 {
+    text-align: center;
+    color: white; /* White color for the heading */
+    margin-bottom: 20px;
+  }
+  
+  /* Label style */
+  label {
+    display: block;
+    margin: 10px 0 5px;
+    color: white; /* White text for labels */
+  }
+  
+  /* Select and textarea elements style */
+  select,
+  textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid white; /* White border */
+    border-radius: 5px;
+    background-color: #004a7c; /* Darker background for better visibility */
+    color: white; /* White text */
+  }
+  
+  /* Prevent resizing of the textarea */
+  textarea {
+    resize: vertical;
+  }
+  
+  /* Button style */
+  button {
+    background-color: #F9BF3B; /* Yellow color for button */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+  }
+  
+  /* Button hover effect */
+  button:hover {
+    background-color: #e08e2b;
+  }

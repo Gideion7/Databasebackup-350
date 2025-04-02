@@ -14,27 +14,27 @@ app.secret_key = os.getenv("SECRET")
 
 # ------------------------ BEGIN FUNCTIONS ------------------------ #
 # Function to retrieve DB connection
-def get_db_connection():
-    conn = mysql.connector.connect(
-        host=os.getenv("DB_HOST"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        database=os.getenv("DB_DATABASE")
-    )
-    return conn
+# def get_db_connection():
+#     conn = mysql.connector.connect(
+#         host=os.getenv("DB_HOST"),
+#         user=os.getenv("DB_USER"),
+#         password=os.getenv("DB_PASSWORD"),
+#         database=os.getenv("DB_DATABASE"),
+#     )
+#     return conn
 
 # Get all items from the "items" table of the db
-def get_all_items():
-    # Create a new database connection for each request
-    conn = get_db_connection()  # Create a new database connection
-    cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
-    # Query the db
-    query = "SELECT name, quantity FROM items"
-    cursor.execute(query)
-    # Get result and close
-    result = cursor.fetchall() # Gets result from query
-    conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
-    return result
+# def get_all_items():
+#     # Create a new database connection for each request
+#     conn = get_db_connection()  # Create a new database connection
+#     cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
+#     # Query the db
+#     query = "SELECT name, quantity FROM items"
+#     cursor.execute(query)
+#     # Get result and close
+#     result = cursor.fetchall() # Gets result from query
+#     conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
+#     return result
 # ------------------------ END FUNCTIONS ------------------------ #
 
 
@@ -42,8 +42,15 @@ def get_all_items():
 # EXAMPLE OF GET REQUEST
 @app.route("/", methods=["GET"])
 def home():
-    items = get_all_items() # Call defined function to get all items
-    return render_template("index.html", items=items) # Return the page to be rendered
+    #items = get_all_items() # Call defined function to get all items
+    return render_template("index.html")  # , items=items add this line when you have things jinga2 needs to display Return the page to be rendered
+
+
+@app.route("/register", methods=["GET"])
+def register():
+    #items = get_all_items() # Call defined function to get all items
+    return render_template("Clean_Squat_Register.html")  # , items=items add this line when you have things jinga2 needs to display Return the page to be rendered
+
 
 # EXAMPLE OF POST REQUEST
 @app.route("/new-item", methods=["POST"])

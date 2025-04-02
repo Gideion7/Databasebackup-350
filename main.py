@@ -51,6 +51,21 @@ def register():
     #items = get_all_items() # Call defined function to get all items
     return render_template("Clean_Squat_Register.html")  # , items=items add this line when you have things jinga2 needs to display Return the page to be rendered
 
+@app.route("/select_building", methods=["GET"])
+def select_building():
+    #items = get_all_items() # Call defined function to get all items
+    return render_template("Clean_Squat_BldgSelect.html")  # , items=items add this line when you have things jinga2 needs to display Return the page to be rendered
+
+@app.route("/main", methods=["GET"])
+def main():
+    #items = get_all_items() # Call defined function to get all items
+    return render_template("Clean_Squat_main.html")  # , items=items add this line when you have things jinga2 needs to display Return the page to be rendered
+
+@app.route("/sorry", methods=["GET"])
+def sorry():
+    #items = get_all_items() # Call defined function to get all items
+    return render_template("sorry.html")  # , items=items add this line when you have things jinga2 needs to display Return the page to be rendered
+
 
 # EXAMPLE OF POST REQUEST
 @app.route("/new-item", methods=["POST"])

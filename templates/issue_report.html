@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Issue Report</title>
+  <!-- Link to the issue_report.css file -->
+  <link rel="stylesheet" href="issue_report.css">
+</head>
+<body>
+
+  <div class="form-container">
+    <h1>Issue Report</h1>
+
+    <form action="#" method="post">
+      <!-- Building Selection -->
+      <label for="building">Select Building:</label>
+      <select id="building" name="building">
+        <option value="CTB">CTB Building</option>
+        <option value="HBLL">HBLL Building</option>
+      </select>
+
+      <!-- Floor Number Selection -->
+      <label for="floor">Select Floor Number:</label>
+      <select id="floor" name="floor">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+
+      <!-- Room Number Selection -->
+      <label for="room">Select Room Number:</label>
+      <select id="room" name="room">
+        <option value="101">101</option>
+        <option value="102">102</option>
+        <option value="103">103</option>
+        <option value="104">104</option>
+        <option value="105">105</option>
+      </select>
+
+      <!-- Description Box -->
+      <label for="description">Issue Description:</label>
+      <textarea id="description" name="description" rows="4" placeholder="Describe the issue here..."></textarea>
+
+      <!-- Submit Button -->
+      <button type="submit">Submit Report</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("issueForm").addEventListener("submit", function(event) {
+      event.preventDefault(); // Prevent actual form submission
+
+      // Get form values
+      let building = document.getElementById("building").value;
+      let floor = document.getElementById("floor").value;
+      let room = document.getElementById("room").value;
+      let description = document.getElementById("description").value.trim();
+
+      // Check if all fields are filled
+      if (building === "" || floor === "" || room === "" || description === "") {
+        alert("Error: Please fill in all fields before submitting.");
+      } else {
+        alert("Submitted successfully!");
+        this.reset(); // Reset the form after successful submission
+      }
+    });
+  </script>
+
+</body>
+</html>

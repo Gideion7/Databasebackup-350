@@ -40,42 +40,95 @@ app.secret_key = os.getenv("SECRET")
 
 # ------------------------ BEGIN ROUTES ------------------------ #
 # EXAMPLE OF GET REQUEST
+
+# When looking to display items dynamically, add < , items=items > as an argument in the return render_template()
+# like this: < return render_template("index.html", items=items) >.
+# this will allow jinga2 to take that argument as something it can use to prepare the information it needs to dsiplay.
+
+#This route renders the index page of our website, which is the login page.
 @app.route("/", methods=["GET"])
-def home():
+def index():
     #items = get_all_items() # Call defined function to get all items
-    return render_template("index.html")  # , items=items add this line when you have things jinga2 needs to display Return the page to be rendered
+    return render_template("index.html") 
 
-
+#This route renders the registration page of the website.
 @app.route("/register", methods=["GET"])
 def register():
     #items = get_all_items() # Call defined function to get all items
-    return render_template("Clean_Squat_Register.html")  # , items=items add this line when you have things jinga2 needs to display Return the page to be rendered
+    return render_template("clean_squat_register.html")  
 
-@app.route("/select_building", methods=["GET"])
-def select_building():
-    #items = get_all_items() # Call defined function to get all items
-    return render_template("Clean_Squat_BldgSelect.html")  # , items=items add this line when you have things jinga2 needs to display Return the page to be rendered
-
+#This route renders the main page of our website that allows users to input information to find a restroom or report an issue.
 @app.route("/main", methods=["GET"])
 def main():
     #items = get_all_items() # Call defined function to get all items
-    return render_template("Clean_Squat_main.html")  # , items=items add this line when you have things jinga2 needs to display Return the page to be rendered
+    return render_template("clean_squat_main.html")
 
-@app.route("/sorry", methods=["GET"])
-def sorry():
+
+#This route renders the select building page of the website.
+@app.route("/select_building", methods=["GET"])
+def select_building():
     #items = get_all_items() # Call defined function to get all items
-    return render_template("sorry.html")  # , items=items add this line when you have things jinga2 needs to display Return the page to be rendered
+    return render_template("clean_squat_bldg_select.html")  
+
+#This route renders the restroom prefrences page of the website where users can select the prefrences they want for a restroom.
+@app.route("/select_preferences", methods=["GET"])
+def select_preferences():
+    #items = get_all_items() # Call defined function to get all items
+    return render_template("clean_squat_preferences.html")
 
 
+#This route renders results page of the website, showing users the bathroom that matches their preferences.
+@app.route("/results", methods=["GET"])
+def results():
+    #items = get_all_items() # Call defined function to get all items
+    return render_template("clean_squat_results.html") 
+
+#This route renders the rating page, where users can rate the restrooms they visited. 
 @app.route("/rating", methods=["GET"])
 def rating():
     #items = get_all_items() # Call defined function to get all items
-    return render_template("rating.html")  # , items=items add this line when you have things jinga2 needs to display Return the page to be rendered
+    return render_template("rating.html")
 
-@app.route("/issue_report", methods=["GET"])
-def issue_report():
+#This route renders the page that allows users to report issues with restrooms to staff. 
+@app.route("/report_an_issue", methods=["GET"])
+def report_an_issue():
     #items = get_all_items() # Call defined function to get all items
-    return render_template("issue_report.html")  # , items=items add this line when you have things jinga2 needs to display Return the page to be rendered
+    return render_template("report_an_issue.html")
+
+
+#This route renders the page that allows staff to navigate to two different pages, one to report cleaning, and the other to see reported issues.
+@app.route("/staff_dashboard", methods=["GET"])
+def staff_dashboard():
+    #items = get_all_items() # Call defined function to get all items
+    return render_template("staff_dash.html")
+
+#This route renders the page that allows staff to view all reported issues.
+@app.route("/staff_issue_portal", methods=["GET"])
+def staff_issue_portal():
+    #items = get_all_items() # Call defined function to get all items
+    return render_template("staff_issue_portal.html")
+
+#This route renders the page that allows staff to view a specific issue and mark it completed.
+@app.route("/selected_issue", methods=["GET"])
+def selected_issue():
+    #items = get_all_items() # Call defined function to get all items
+    return render_template("selected_issue.html")
+
+#This route renders the page that allows staff to record which bathroom they have cleaned.
+@app.route("/report_cleaning", methods=["GET"])
+def report_cleaning():
+    #items = get_all_items() # Call defined function to get all items
+    return render_template("report_cleaning.html")
+
+#This route renders the page users are taken to if no bathrooms match their preferences.
+@app.route("/sorry", methods=["GET"])
+def sorry():
+    #items = get_all_items() # Call defined function to get all items
+    return render_template("sorry.html")
+
+
+
+
 
 
 # EXAMPLE OF POST REQUEST

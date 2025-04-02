@@ -1,0 +1,76 @@
+/* Center the stars and set the background to dark blue */
+body {
+  background-color: #001f3d; /* Dark blue background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  margin: 0;
+}
+
+.rating {
+  width: 400px;
+}
+
+.rating > * {
+  float: right;
+}
+
+@keyframes pulse {
+  50% {
+    color: lighten(#444, 10%);
+    text-shadow: 0 0 15px lighten(#444, 20%);
+  }
+}
+
+.rating label {
+  height: 40px;
+  width: 20%;
+  display: block;
+  position: relative;
+  cursor: pointer;
+}
+
+.rating label:after {
+  transition: all 0.4s ease-out;
+  -webkit-font-smoothing: antialiased;
+  position: absolute;
+  content: '☆';
+  color: #444;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  font-size: 80px;
+  animation: 1s pulse ease;
+}
+
+.rating label:hover:after {
+  color: lighten(#444, 10%);
+  text-shadow: 0 0 15px lighten(#444, 10%);
+}
+
+.rating input {
+  display: none;
+}
+
+.rating input:checked + label:after,
+.rating input:checked ~ label:after {
+  content: '★';
+  color: #F9BF3B;
+  text-shadow: 0 0 20px #F9BF3B;
+}
+
+.rating input:checked + label:after,
+.rating input:checked ~ label:after {
+  animation: none;
+}
+
+/* Add this to your existing CSS */
+#ratingResult {
+  color: #F9BF3B; /* Set the text color to yellow (or any other color that fits your design) */
+  font-size: 18px; /* Adjust the font size */
+  margin-top: 20px; /* Add some space between the button and result */
+  text-align: center; /* Center align the text */
+}

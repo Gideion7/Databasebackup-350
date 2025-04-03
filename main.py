@@ -24,29 +24,29 @@ def get_db_connection():
     return conn
 
 # Get all items from the "items" table of the db
-def get_all_items():
-    # Create a new database connection for each request
-    conn = get_db_connection()  # Create a new database connection
-    cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
-    # Query the db
-    query = "SELECT name, quantity FROM items"
-    cursor.execute(query)
-    # Get result and close
-    result = cursor.fetchall() # Gets result from query
-    conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
-    return result
+# def get_all_items():
+#     # Create a new database connection for each request
+#     conn = get_db_connection()  # Create a new database connection
+#     cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
+#     # Query the db
+#     query = "SELECT name, quantity FROM items"
+#     cursor.execute(query)
+#     # Get result and close
+#     result = cursor.fetchall() # Gets result from query
+#     conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
+#     return result
 
 def get_all_building_names():
     # Create a new database connection for each request
     conn = get_db_connection()  # Create a new database connection
     cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
     # Query the db
-    query = "SELECT * FROM Clean_Squat.BUILDING"
+    query = "SELECT BuildingName FROM BUILDING"
     cursor.execute(query)
     # Get result and close
     result = cursor.fetchall() # Gets result from query
     conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
-    return result
+    return [row[0] for row in result]
 # ------------------------ END FUNCTIONS ------------------------ #
 
 
@@ -82,7 +82,8 @@ def main():
 @app.route("/select_building", methods=["GET"])
 def select_building():
     list_of_buildings = get_all_building_names() # Call defined function to get all items
-    return render_template("clean_squat_bldg_select.html", items=list_of_buildings)  
+    print(list_of_buildings)
+    return render_template("clean_squat_bldg_select.html", buildings=list_of_buildings)  
 
 
 #This route renders the restroom prefrences page of the website where users can select the prefrences they want for a restroom.

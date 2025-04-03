@@ -14,27 +14,39 @@ app.secret_key = os.getenv("SECRET")
 
 # ------------------------ BEGIN FUNCTIONS ------------------------ #
 # Function to retrieve DB connection
-# def get_db_connection():
-#     conn = mysql.connector.connect(
-#         host=os.getenv("DB_HOST"),
-#         user=os.getenv("DB_USER"),
-#         password=os.getenv("DB_PASSWORD"),
-#         database=os.getenv("DB_DATABASE"),
-#     )
-#     return conn
+def get_db_connection():
+    conn = mysql.connector.connect(
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_DATABASE"),
+    )
+    return conn
 
 # Get all items from the "items" table of the db
-# def get_all_items():
-#     # Create a new database connection for each request
-#     conn = get_db_connection()  # Create a new database connection
-#     cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
-#     # Query the db
-#     query = "SELECT name, quantity FROM items"
-#     cursor.execute(query)
-#     # Get result and close
-#     result = cursor.fetchall() # Gets result from query
-#     conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
-#     return result
+def get_all_items():
+    # Create a new database connection for each request
+    conn = get_db_connection()  # Create a new database connection
+    cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
+    # Query the db
+    query = "SELECT name, quantity FROM items"
+    cursor.execute(query)
+    # Get result and close
+    result = cursor.fetchall() # Gets result from query
+    conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
+    return result
+
+def get_all_building_names():
+    # Create a new database connection for each request
+    conn = get_db_connection()  # Create a new database connection
+    cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
+    # Query the db
+    query = "SELECT * FROM Clean_Squat.BUILDING"
+    cursor.execute(query)
+    # Get result and close
+    result = cursor.fetchall() # Gets result from query
+    conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
+    return result
 # ------------------------ END FUNCTIONS ------------------------ #
 
 
@@ -51,11 +63,13 @@ def index():
     #items = get_all_items() # Call defined function to get all items
     return render_template("index.html") 
 
+
 #This route renders the registration page of the website.
 @app.route("/register", methods=["GET"])
 def register():
     #items = get_all_items() # Call defined function to get all items
     return render_template("clean_squat_register.html")  
+
 
 #This route renders the main page of our website that allows users to input information to find a restroom or report an issue.
 @app.route("/main", methods=["GET"])
@@ -67,8 +81,9 @@ def main():
 #This route renders the select building page of the website.
 @app.route("/select_building", methods=["GET"])
 def select_building():
-    #items = get_all_items() # Call defined function to get all items
-    return render_template("clean_squat_bldg_select.html")  
+    list_of_buildings = get_all_building_names() # Call defined function to get all items
+    return render_template("clean_squat_bldg_select.html", items=list_of_buildings)  
+
 
 #This route renders the restroom prefrences page of the website where users can select the prefrences they want for a restroom.
 @app.route("/select_preferences", methods=["GET"])
@@ -83,11 +98,13 @@ def results():
     #items = get_all_items() # Call defined function to get all items
     return render_template("clean_squat_results.html") 
 
+
 #This route renders the rating page, where users can rate the restrooms they visited. 
 @app.route("/rating", methods=["GET"])
 def rating():
     #items = get_all_items() # Call defined function to get all items
     return render_template("rating.html")
+
 
 #This route renders the page that allows users to report issues with restrooms to staff. 
 @app.route("/report_an_issue", methods=["GET"])
@@ -102,23 +119,30 @@ def staff_dashboard():
     #items = get_all_items() # Call defined function to get all items
     return render_template("staff_dash.html")
 
+
+#THIS VIEW FILE IS MISSING
 #This route renders the page that allows staff to view all reported issues.
 @app.route("/staff_issue_portal", methods=["GET"])
 def staff_issue_portal():
     #items = get_all_items() # Call defined function to get all items
     return render_template("staff_issue_portal.html")
 
+
+#THIS VIEW FILE IS MISSING
 #This route renders the page that allows staff to view a specific issue and mark it completed.
 @app.route("/selected_issue", methods=["GET"])
 def selected_issue():
     #items = get_all_items() # Call defined function to get all items
     return render_template("selected_issue.html")
 
+
+#THIS VIEW FILE IS MISSING
 #This route renders the page that allows staff to record which bathroom they have cleaned.
 @app.route("/report_cleaning", methods=["GET"])
 def report_cleaning():
     #items = get_all_items() # Call defined function to get all items
     return render_template("report_cleaning.html")
+
 
 #This route renders the page users are taken to if no bathrooms match their preferences.
 @app.route("/sorry", methods=["GET"])

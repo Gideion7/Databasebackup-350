@@ -47,6 +47,8 @@ def get_all_building_names():
     result = cursor.fetchall() # Gets result from query
     conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
     return [row[0] for row in result]
+
+
 # ------------------------ END FUNCTIONS ------------------------ #
 
 
@@ -87,14 +89,20 @@ def select_building():
             session["selected_building"] = selected_building  # Store the building in the session
         return redirect(url_for("main"))  # Redirect to main page after selecting the building
     list_of_buildings = get_all_building_names() # Call defined function to get all items
-    print(session)
+    
     return render_template("clean_squat_bldg_select.html", buildings=list_of_buildings)  
 
 
 #This route renders the restroom prefrences page of the website where users can select the prefrences they want for a restroom.
-@app.route("/select_preferences", methods=["GET"])
+@app.route("/select_preferences", methods=["GET", "POST"])
 def select_preferences():
-    #items = get_all_items() # Call defined function to get all items
+    if request.method == "POST":
+        selected_type = request.form.get("type")  # Get the selected type from the form
+        selected_gender = request.form.get("gender")  # Get the selected gender from the form
+        session["selected_type"] = selected_type  # Store the type in the session
+        session["selected_gender"] = selected_gender  # Store the type in the session
+        return redirect(url_for("main"))  # Redirect to main page after selecting the building
+    print(session)
     return render_template("clean_squat_preferences.html")
 
 

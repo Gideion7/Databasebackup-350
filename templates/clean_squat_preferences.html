@@ -9,7 +9,7 @@
 <body>
     <div class="form-container">
         <h1>Restroom Preferences</h1>
-        <form action="#" method="POST">
+        <form action="{{ url_for('select_preferences') }}" method="POST">
             <!-- Type Dropdown -->
             <label for="type">Type:</label>
             <select id="type" name="type">

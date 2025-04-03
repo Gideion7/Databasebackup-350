@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 import mysql.connector
 from dotenv import load_dotenv
 
@@ -79,10 +79,15 @@ def main():
 
 
 #This route renders the select building page of the website.
-@app.route("/select_building", methods=["GET"])
+@app.route("/select_building", methods=["GET", "POST"])
 def select_building():
+    if request.method == "POST":
+        selected_building = request.form.get("building")  # Get the selected building from the form
+        if selected_building:
+            session["selected_building"] = selected_building  # Store the building in the session
+        return redirect(url_for("main"))  # Redirect to main page after selecting the building
     list_of_buildings = get_all_building_names() # Call defined function to get all items
-    print(list_of_buildings)
+    print(session)
     return render_template("clean_squat_bldg_select.html", buildings=list_of_buildings)  
 
 

@@ -14,15 +14,20 @@
 
     <form action="#" method="post">
       <!-- Report Cleaning Button -->
-      <button type="submit">Report Cleaning</button>
+      <button type="button">Report Cleaning</button>
       <br><br>
       <!-- Issue Portal Button -->
-      <a href="../issue_report/issue_report.html">
+      <button type="button">Issue Portal</button>
+      <!-- <a href="../issue_report/issue_report.html">
         <button type="button">Issue Portal</button>
-      </a>
+      </a> -->
       <br><br>
       <!-- Logout Button -->
-      <button type="submit">Logout</button>
+      <a href="/">
+        <button type="button">Logout</button>
+      </a>  
+      <!-- <a href="{{ url_for('index') }}">Logout</a> -->
+      <!-- <p>Flask URL Test: {{ url_for('index') }}</p> -->
     </form>
   </div>
 

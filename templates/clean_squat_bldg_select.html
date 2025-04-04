@@ -13,7 +13,7 @@
             <label for="building">Select Building:</label>
             <select id="building" name="building">
                 {% for building in buildings %}
-                <option value="{{ building }}">{{ building }}</option>
+                <option value="{{ building[0] }}">{{ building[1] }}</option>
                 {% endfor %} 
             </select>
             <button type="submit">Select Building</button>

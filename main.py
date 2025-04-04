@@ -36,18 +36,45 @@ def get_db_connection():
 #     conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
 #     return result
 
-def get_all_building_names():
+# def get_all_building_names():
+#     # Create a new database connection for each request
+#     conn = get_db_connection()  # Create a new database connection
+#     cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
+#     # Query the db
+#     query = "SELECT BuildingName FROM BUILDING"
+#     cursor.execute(query)
+#     # Get result and close
+#     result = cursor.fetchall() # Gets result from query
+#     conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
+#     return [row[0] for row in result]
+
+def get_all_building_names_and_ids():
     # Create a new database connection for each request
     conn = get_db_connection()  # Create a new database connection
     cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
     # Query the db
-    query = "SELECT BuildingName FROM BUILDING"
+    query = "SELECT BuildingID, BuildingName FROM BUILDING"
+    cursor.execute(query)
+    # Get result and close
+    result = cursor.fetchall() # Gets result from query
+    conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
+    print('look go')
+    print(result)
+    return result
+    
+    # return [row[0] for row in result]
+
+def get_results():
+    # Create a new database connection for each request
+    conn = get_db_connection()  # Create a new database connection
+    cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
+    # Query the db
+    query = "SELECT BuildingName, FloorNumber, RoomNumber, Rating FROM Clean_Squat.MainView WHERE BuildingID =  AND Gender = AND Type ="
     cursor.execute(query)
     # Get result and close
     result = cursor.fetchall() # Gets result from query
     conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
     return [row[0] for row in result]
-
 
 # ------------------------ END FUNCTIONS ------------------------ #
 
@@ -84,11 +111,11 @@ def main():
 @app.route("/select_building", methods=["GET", "POST"])
 def select_building():
     if request.method == "POST":
-        selected_building = request.form.get("building")  # Get the selected building from the form
-        if selected_building:
-            session["selected_building"] = selected_building  # Store the building in the session
+        selected_building_id = request.form.get("building")  # Get the selected building from the form
+        if selected_building_id:
+            session["selected_building_id"] = selected_building_id  # Store the building in the session
         return redirect(url_for("main"))  # Redirect to main page after selecting the building
-    list_of_buildings = get_all_building_names() # Call defined function to get all items
+    list_of_buildings = get_all_building_names_and_ids() # Call defined function to get all items
     
     return render_template("clean_squat_bldg_select.html", buildings=list_of_buildings)  
 
@@ -102,8 +129,11 @@ def select_preferences():
         session["selected_type"] = selected_type  # Store the type in the session
         session["selected_gender"] = selected_gender  # Store the type in the session
         return redirect(url_for("main"))  # Redirect to main page after selecting the building
-    print(session)
+    all_sessions = dict(session)
+    print("This is your dictionary")
+    print(all_sessions)
     return render_template("clean_squat_preferences.html")
+    
 
 
 #This route renders results page of the website, showing users the bathroom that matches their preferences.

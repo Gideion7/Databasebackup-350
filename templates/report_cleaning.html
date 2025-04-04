@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Cleaning</title>
+    <!-- Link to the shared CSS file -->
+    <link rel="stylesheet" href="../static/css/styles.css">
+</head>
+<body>
+
+  <div class="form-container">
+    <h1>Report Cleaning</h1>
+    <form method="POST">
+      <!-- Building Selection -->
+      <label for="building">Select Building:</label>
+      <select name="building_id" required>
+        {% for building in buildings %}
+          <option value="{{ building[0] }}">{{ building[1] }}</option>
+        {% endfor %}
+      </select>
+      <br>
+
+      <!-- Floor Number Selection -->
+      <label for="floor">Select Floor Number:</label>
+      <select name="floor" required>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+      <br>
+
+      <!-- Room Number Selection -->
+      <label for="room">Select Room Number:</label>
+      <select name="room" required>
+        <option value="101">101</option>
+        <option value="102">102</option>
+        <option value="103">103</option>
+        <option value="104">104</option>
+        <option value="105">105</option>
+      </select>
+      <br>
+
+      <!-- Timestamp Selection -->
+      <label for="timestamp">Timestamp:</label>
+      <input type="datetime-local" name="timestamp" required>
+      <br>
+
+      <button type="submit">Submit Report</button>
+    </form>
+  </div>
+
+</body>
+</html>

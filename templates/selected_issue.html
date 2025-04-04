@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selected Issue</title>
+  <!-- Link to the styles.css file -->
+  <link rel="stylesheet" href="../static/css/styles.css">
+</head>
+<body>
+  <div class="form-container">
+    <h1>Selected Issue</h1>
+
+    <!-- Issue Selection -->
+    <form method="POST">
+      <!-- Issue Selection -->
+      <label for="issue">Select an Issue:</label>
+      <select name="issue" required>
+        
+          <option value="{{ issue[0] }}">{{ issue[1] }} (Reported: {{ issue[2] }})</option>
+        
+      </select>
+      <button type="submit">View Details</button>
+    </form>
+
+    
+    <!-- Displaying Issue Details -->
+    <div class="issue-details">
+      <p><strong>Date Reported:</strong> {{ selected_issue[0] }}</p>
+      <p><strong>Description:</strong> {{ selected_issue[1] }}</p>
+      <p><strong>Resolved:</strong> 
+        <form method="POST" action="/update-status">
+          <input type="radio" id="yes" name="resolved" value="yes" {% if selected_issue[2] == 'yes' %}checked{% endif %}> 
+          <label for="yes">Yes</label>
+          <input type="radio" id="no" name="resolved" value="no" {% if selected_issue[2] == 'no' %}checked{% endif %}> 
+          <label for="no">No</label>
+          <button type="submit">Update Status</button>
+        </form>
+      </p>
+    </div>
+
+    
+    <a href="/staff-issue-portal">
+      <button type="button" class="back-btn">Back</button>
+    </a>
+  </div>
+</body>
+</html>

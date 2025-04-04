@@ -41,33 +41,38 @@
     <div class="form-container">
         <h1>Results</h1>
 
-        <div class="field-row">
-            <label>Building:</label>
-            <div id="building">CTB</div>
-        </div>
+        {% if result %}
+            {% for row in result %}
+                <div class="field-row">
+                    <label>Building:</label>
+                    <div id="building">{{ row[0] }}</div> <!-- BuildingID -->
+                </div>
 
-        <div class="field-row">
-            <label>Floor Number:</label>
-            <div id="floor">2</div>
-        </div>
+                <div class="field-row">
+                    <label>Floor Number:</label>
+                    <div id="floor">{{ row[1] }}</div> <!-- FloorNumber -->
+                </div>
 
-        <div class="field-row">
-            <label>Room Number:</label>
-            <div id="room">204</div>
-        </div>
+                <div class="field-row">
+                    <label>Room Number:</label>
+                    <div id="room">{{ row[2] }}</div> <!-- RoomNumber -->
+                </div>
 
-        <div class="field-row">
-            <label>Current Rating:</label>
-            <div id="rating">4.5</div>
-        </div>
+                <div class="field-row">
+                    <label>Current Rating:</label>
+                    <div id="rating">{{ row[3] }}</div> <!-- Rating -->
+                </div>
+            {% endfor %}
+        
+
         <a href="/rating">
-        <button type="button">Rate This Restroom</button>
+            <button type="button">Rate This Restroom</button>
         </a>
         <a href="/report_an_issue">    
-        <button type="button">Report an Issue</button>
+            <button type="button">Report an Issue</button>
         </a>
         <a href="/main">
-        <button type="submit">Done</button>
+            <button type="submit">Done</button>
         </a>
     </div>
 </body>

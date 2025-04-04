@@ -66,15 +66,20 @@ def get_all_building_names_and_ids():
 
 def get_results():
     # Create a new database connection for each request
+    selected_building_id = session['selected_building_id']
+    selected_type = session['selected_type']
+    selected_gender = session['selected_gender']
     conn = get_db_connection()  # Create a new database connection
     cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
     # Query the db
-    query = "SELECT BuildingName, FloorNumber, RoomNumber, Rating FROM Clean_Squat.MainView WHERE BuildingID =  AND Gender = AND Type ="
-    cursor.execute(query)
+    query = "SELECT BuildingID, FloorNumber, RoomNumber, Rating FROM Clean_Squat.PreferencesView WHERE BuildingID = %s AND IsPrivate = %s AND Gender = %s ORDER BY CleaningTimeStamp DESC LIMIT 1"
+    cursor.execute(query, (selected_building_id, selected_gender, selected_type))
     # Get result and close
     result = cursor.fetchall() # Gets result from query
     conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
-    return [row[0] for row in result]
+    print("this is the result:")
+    print(result)
+    return result
 
 # ------------------------ END FUNCTIONS ------------------------ #
 
@@ -125,9 +130,29 @@ def select_building():
 def select_preferences():
     if request.method == "POST":
         selected_type = request.form.get("type")  # Get the selected type from the form
+        if selected_type == 'public':
+            selected_type = False
+        elif selected_type == 'private':
+            selected_type = True
+        
         selected_gender = request.form.get("gender")  # Get the selected gender from the form
+        while True:
+            if selected_type == 'private':
+                selected_gender = None  # Set selected_gender to None if type is private
+                break  # Exit the loop after setting selected_gender to None
+
+            if selected_gender == 'male':
+                selected_gender = 'male'  # Set selected_gender to "male"
+                break  # Exit the loop after updating selected_gender
+
+            if selected_gender == 'female':
+                selected_gender = 'female'  # Set selected_gender to "female"
+                break  # Exit the loop after updating selected_gender
+
         session["selected_type"] = selected_type  # Store the type in the session
         session["selected_gender"] = selected_gender  # Store the type in the session
+        print(selected_type)
+        print(selected_gender)
         return redirect(url_for("main"))  # Redirect to main page after selecting the building
     all_sessions = dict(session)
     print("This is your dictionary")
@@ -139,8 +164,10 @@ def select_preferences():
 #This route renders results page of the website, showing users the bathroom that matches their preferences.
 @app.route("/results", methods=["GET"])
 def results():
-    #items = get_all_items() # Call defined function to get all items
-    return render_template("clean_squat_results.html") 
+    results = get_results() # Call defined function to get all results
+    if not results:
+        return redirect(url_for('sorry'))
+    return render_template("clean_squat_results.html", result=results) 
 
 
 #This route renders the rating page, where users can rate the restrooms they visited. 

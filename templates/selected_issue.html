@@ -1,48 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Selected Issue</title>
-  <!-- Link to the styles.css file -->
-  <link rel="stylesheet" href="../static/css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Issue</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
+
   <div class="form-container">
-    <h1>Selected Issue</h1>
+    <h1>View Issue</h1>
 
-    <!-- Issue Selection -->
-    <form method="POST">
-      <!-- Issue Selection -->
-      <label for="issue">Select an Issue:</label>
-      <select name="issue" required>
-        
-          <option value="{{ issue[0] }}">{{ issue[1] }} (Reported: {{ issue[2] }})</option>
-        
-      </select>
-      <button type="submit">View Details</button>
-    </form>
+    <!-- Display Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="alert alert-{{ messages[0][0] }}">
+          {{ messages[0][1] }}
+        </div>
+      {% endif %}
+    {% endwith %}
 
-    
-    <!-- Displaying Issue Details -->
-    <div class="issue-details">
-      <p><strong>Date Reported:</strong> {{ selected_issue[0] }}</p>
-      <p><strong>Description:</strong> {{ selected_issue[1] }}</p>
-      <p><strong>Resolved:</strong> 
-        <form method="POST" action="/update-status">
-          <input type="radio" id="yes" name="resolved" value="yes" {% if selected_issue[2] == 'yes' %}checked{% endif %}> 
-          <label for="yes">Yes</label>
-          <input type="radio" id="no" name="resolved" value="no" {% if selected_issue[2] == 'no' %}checked{% endif %}> 
-          <label for="no">No</label>
-          <button type="submit">Update Status</button>
-        </form>
+    <div>
+      <p><strong>Issue ID:</strong> {{ issue[0] }}</p>
+      <p><strong>Description:</strong> {{ issue[1] }}</p>
+      <p><strong>Status:</strong> 
+        {% if issue[2] %}
+          Completed
+        {% else %}
+          Not Completed
+        {% endif %}
       </p>
     </div>
 
-    
-    <a href="/staff-issue-portal">
-      <button type="button" class="back-btn">Back</button>
-    </a>
+    <!-- Form to update status -->
+    <form method="POST" action="{{ url_for('update_issue_status', issue_id=issue[0], status=(1 if not issue[2] else 0)) }}">
+      <button type="submit">
+        {% if issue[2] %}
+          Mark as Not Completed
+        {% else %}
+          Mark as Completed
+        {% endif %}
+      </button>
+    </form>
+
+    <a href="{{ url_for('staff_issue_portal') }}" class="btn btn-secondary mt-4">Back to Issue Portal</a>
   </div>
+
 </body>
 </html>

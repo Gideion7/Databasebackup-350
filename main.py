@@ -173,10 +173,10 @@ def rating():
 
 
 #This route renders the page that allows users to report issues with restrooms to staff. 
-@app.route("/report_an_issue", methods=["GET"])
-def report_an_issue():
-    #items = get_all_items() # Call defined function to get all items
-    return render_template("report_an_issue.html")
+# @app.route("/report_an_issue", methods=["GET"])
+# def report_an_issue():
+#     #items = get_all_items() # Call defined function to get all items
+#     return render_template("report_an_issue.html")
 
 
 #This route renders the page that allows staff to navigate to two different pages, one to report cleaning, and the other to see reported issues.
@@ -190,16 +190,126 @@ def staff_dashboard():
 #This route renders the page that allows staff to view all reported issues.
 @app.route("/staff_issue_portal", methods=["GET"])
 def staff_issue_portal():
-    #items = get_all_items() # Call defined function to get all items
-    return render_template("staff_issue_portal.html")
+    # Connect to the database
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Get all issues, including their updated status
+    cursor.execute("""
+        SELECT IssueID, Description, CompletionStatus
+        FROM Clean_Squat.ISSUEREPORT
+    """)
+    issues = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template("staff_issue_portal.html", issues=issues)
 
 
-#THIS VIEW FILE IS MISSING
-#This route renders the page that allows staff to view a specific issue and mark it completed.
-@app.route("/selected_issue", methods=["GET"])
-def selected_issue():
-    #items = get_all_items() # Call defined function to get all items
-    return render_template("selected_issue.html")
+
+@app.route("/selected_issue/<int:issue_id>", methods=["GET", "POST"])
+def selected_issue(issue_id):
+    # Connect to the database
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Fetch the issue details
+    cursor.execute("""
+        SELECT IssueID, Description, CompletionStatus 
+        FROM Clean_Squat.ISSUEREPORT 
+        WHERE IssueID = %s
+    """, (issue_id,))
+    issue = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not issue:
+        flash("Issue not found.", "error")
+        return redirect(url_for('staff_issue_portal'))
+
+    return render_template("selected_issue.html", issue=issue)
+
+
+
+@app.route("/report_an_issue", methods=["GET", "POST"])
+def report_an_issue():
+    if request.method == "POST":
+        # Get form data
+        description = request.form["description"]
+        timestamp = request.form["timestamp"]
+        building_id = request.form["building_id"]
+        floor = request.form["floor"]
+        room = request.form["room"]
+
+        # Connect to the database
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        try:
+            # Query to get the RestroomID for the selected BuildingID, FloorNumber, and RoomNumber
+            cursor.execute("""
+                SELECT RestroomID 
+                FROM Clean_Squat.RESTROOM 
+                WHERE BuildingID = %s AND FloorNumber = %s AND RoomNumber = %s
+            """, (building_id, floor, room))
+            restroom_id = cursor.fetchone()
+
+            if not restroom_id:
+                # If no RestroomID is found, flash an error message and redirect back to the form
+                flash("No matching restroom found for the selected building, floor, and room.", "error")
+                return redirect(url_for("report_an_issue"))
+
+            # Proceed with inserting the issue, using the RestroomID
+            restroom_id = restroom_id[0]
+            cursor.execute("""
+                INSERT INTO Clean_Squat.ISSUEREPORT (Description, CompletionStatus, ReportTimeStamp, RestroomID)
+                VALUES (%s, %s, %s, %s)
+            """, (description, False, timestamp, restroom_id))
+
+            # Commit the transaction
+            conn.commit()
+            flash("Issue reported successfully!", "success")
+            return redirect(url_for("staff_issue_portal"))  # Redirect to the staff issue portal after submission
+
+        except mysql.connector.Error as err:
+            flash(f"Error: {err}", "error")
+            return redirect(url_for("report_an_issue"))
+
+        finally:
+            cursor.close()
+            conn.close()
+
+    return render_template("report_an_issue.html")
+
+@app.route("/update_issue_status/<int:issue_id>/<int:status>", methods=["POST"])
+def update_issue_status(issue_id, status):
+    # Connect to the database
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Update the issue status in the database
+        cursor.execute("""
+            UPDATE Clean_Squat.ISSUEREPORT 
+            SET CompletionStatus = %s 
+            WHERE IssueID = %s
+        """, (status, issue_id))
+
+        # Commit the changes
+        conn.commit()
+        flash("Issue status updated successfully!", "success")
+        return redirect(url_for("staff_issue_portal"))  # Redirect back to the staff issue portal
+
+    except mysql.connector.Error as err:
+        flash(f"Error: {err}", "error")
+        return redirect(url_for("staff_issue_portal"))
+
+    finally:
+        cursor.close()
+        conn.close()
+
 
 
 #THIS VIEW FILE IS MISSING

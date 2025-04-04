@@ -1,26 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Staff Issue Portal</title>
-  <link rel="stylesheet" href="../static/css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Issue Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
+
   <div class="form-container">
     <h1>Staff Issue Portal</h1>
 
-    <div class="buttons">
-      <!-- Button for List of Issues -->
-      <button type="button" class="button" onclick="window.location.href='/list-issues'">List of Issues</button>
+    <!-- Display Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="alert alert-{{ messages[0][0] }}">
+          {{ messages[0][1] }}
+        </div>
+      {% endif %}
+    {% endwith %}
 
-      <!-- Button for Resolved Issues -->
-      <button type="button" class="button" onclick="window.location.href='/resolved-issues'">Resolved Issues</button>
-    </div>
-
-    <!-- Back Button -->
-    <button type="button" class="back-button" onclick="window.location.href='/dashboard'">Back</button>
+    <table>
+      <thead>
+        <tr>
+          <th>Issue ID</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for issue in issues %}
+          <tr>
+            <td>{{ issue[0] }}</td>
+            <td>{{ issue[1] }}</td>
+            <td>
+              {% if issue[2] == 1 %}
+                <span style="color: green;">Completed</span>
+              {% else %}
+                <span style="color: red;">Not Completed</span>
+              {% endif %}
+            </td>
+            <td>
+              <!-- Link to view the issue details -->
+              <a href="{{ url_for('selected_issue', issue_id=issue[0]) }}">View Issue</a>
+              {% if issue[2] == 1 %}
+                <!-- If completed, show a "Mark as Not Completed" button -->
+                <form method="POST" action="{{ url_for('update_issue_status', issue_id=issue[0], status=0) }}">
+                 
+                </form>
+              {% else %}
+                <!-- If not completed, show a "Mark as Completed" button -->
+                <form method="POST" action="{{ url_for('update_issue_status', issue_id=issue[0], status=1) }}">
+                  
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
+
 </body>
 </html>
-

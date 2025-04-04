@@ -64,22 +64,55 @@ def get_all_building_names_and_ids():
     
     # return [row[0] for row in result]
 
+# def get_results():
+#     # Create a new database connection for each request
+#     selected_building_id = session['selected_building_id']
+#     selected_type = session['selected_type']
+#     selected_gender = session['selected_gender']
+#     conn = get_db_connection()  # Create a new database connection
+#     cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
+#     # Query the db
+#     query = "SELECT BuildingID, FloorNumber, RoomNumber, Rating FROM Clean_Squat.PreferencesView WHERE BuildingID = %s AND IsPrivate = %s AND Gender = %s ORDER BY CleaningTimeStamp DESC LIMIT 1"
+#     cursor.execute(query, (selected_building_id, selected_gender, selected_type))
+#     # Get result and close
+#     result = cursor.fetchall() # Gets result from query
+#     conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
+#     print("this is the result:")
+#     print(result)
+#     return result
+
 def get_results():
-    # Create a new database connection for each request
     selected_building_id = session['selected_building_id']
     selected_type = session['selected_type']
     selected_gender = session['selected_gender']
-    conn = get_db_connection()  # Create a new database connection
-    cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
-    # Query the db
-    query = "SELECT BuildingID, FloorNumber, RoomNumber, Rating FROM Clean_Squat.PreferencesView WHERE BuildingID = %s AND IsPrivate = %s AND Gender = %s ORDER BY CleaningTimeStamp DESC LIMIT 1"
-    cursor.execute(query, (selected_building_id, selected_gender, selected_type))
-    # Get result and close
-    result = cursor.fetchall() # Gets result from query
-    conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
-    print("this is the result:")
-    print(result)
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    if selected_gender is None:
+        query = """
+        SELECT BuildingID, FloorNumber, RoomNumber, Rating
+        FROM Clean_Squat.PreferencesView
+        WHERE BuildingID = %s AND IsPrivate = %s AND Gender IS NULL
+        ORDER BY CleaningTimeStamp DESC
+        LIMIT 1
+        """
+        cursor.execute(query, (selected_building_id, selected_type))
+    else:
+        query = """
+        SELECT BuildingID, FloorNumber, RoomNumber, Rating
+        FROM Clean_Squat.PreferencesView
+        WHERE BuildingID = %s AND IsPrivate = %s AND Gender = %s
+        ORDER BY CleaningTimeStamp DESC
+        LIMIT 1
+        """
+        cursor.execute(query, (selected_building_id, selected_type, selected_gender))
+
+    result = cursor.fetchall()
+    conn.close()
+    print
     return result
+
 
 # ------------------------ END FUNCTIONS ------------------------ #
 
@@ -135,7 +168,7 @@ def select_preferences():
         # Convert selected_type to boolean
         if selected_type == "private":
             selected_type = True
-            selected_gender = "IS NULL"  # Set gender to None if private
+            selected_gender = None  # Set gender to None if private
         elif selected_type == "public":
             selected_type = False
             # Gender remains whatever was submitted

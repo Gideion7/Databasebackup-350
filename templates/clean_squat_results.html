@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,3 +78,79 @@
     </div>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <style>
+        .field-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .field-row label {
+            flex: 1;
+            margin-right: 10px;
+            text-align: left;
+        }
+
+        .field-row div {
+            flex: 2;
+            background-color: #004a7c;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid white;
+        }
+
+        .form-container button {
+            margin-top: 10px;
+        }
+
+        .form-container button + button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Results</h1>
+
+        <div class="field-row">
+            <label>Building:</label>
+            <div id="building">CTB</div>
+        </div>
+
+        <div class="field-row">
+            <label>Floor Number:</label>
+            <div id="floor">2</div>
+        </div>
+
+        <div class="field-row">
+            <label>Room Number:</label>
+            <div id="room">204</div>
+        </div>
+
+        <div class="field-row">
+            <label>Current Rating:</label>
+            <div id="rating">4.5</div>
+        </div>
+        <a href="/rating">
+        <button type="button">Rate This Restroom</button>
+        </a>
+        <a href="/report_an_issue">    
+        <button type="button">Report an Issue</button>
+        </a>
+        <a href="/main">
+        <button type="submit">Done</button>
+        </a>
+    </div>
+</body>
+</html>
+>>>>>>> fd675ed315d28cf6c9ec7889010158bb01d585b6

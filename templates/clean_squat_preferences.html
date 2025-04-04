@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restroom Preferences</title>
     <link rel="stylesheet" href="../static/css/styles.css">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const typeSelect = document.getElementById("type");
+            const genderSelect = document.getElementById("gender");
+
+            function toggleGenderDropdown() {
+                if (typeSelect.value === "private") {
+                    genderSelect.disabled = true;
+                    genderSelect.value = ""; // Clear gender if private
+                } else {
+                    genderSelect.disabled = false;
+                }
+            }
+
+            // Run on page load and when the dropdown changes
+            toggleGenderDropdown();
+            typeSelect.addEventListener("change", toggleGenderDropdown);
+        });
+    </script>
 </head>
 <body>
     <div class="form-container">
@@ -13,6 +32,7 @@
             <!-- Type Dropdown -->
             <label for="type">Type:</label>
             <select id="type" name="type">
+                <option value="">-- Select Type --</option>
                 <option value="public">Public</option>
                 <option value="private">Private</option>
             </select>
@@ -20,7 +40,8 @@
             <!-- Gender Selection -->
             <label for="gender">Gender:</label>
             <select id="gender" name="gender">
-                <option value="male">bigint</option>
+                <option value="">-- Select Gender --</option>
+                <option value="male">Male</option>
                 <option value="female">Female</option>
             </select>
             

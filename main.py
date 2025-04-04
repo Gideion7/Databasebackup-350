@@ -129,33 +129,28 @@ def select_building():
 @app.route("/select_preferences", methods=["GET", "POST"])
 def select_preferences():
     if request.method == "POST":
-        selected_type = request.form.get("type")  # Get the selected type from the form
-        if selected_type == 'public':
-            selected_type = False
-        elif selected_type == 'private':
+        selected_type = request.form.get("type")  # "public" or "private"
+        selected_gender = request.form.get("gender")  # "male", "female", or None
+
+        # Convert selected_type to boolean
+        if selected_type == "private":
             selected_type = True
-        
-        selected_gender = request.form.get("gender")  # Get the selected gender from the form
-        while True:
-            if selected_type == 'private':
-                selected_gender = None  # Set selected_gender to None if type is private
-                break  # Exit the loop after setting selected_gender to None
+            selected_gender = "IS NULL"  # Set gender to None if private
+        elif selected_type == "public":
+            selected_type = False
+            # Gender remains whatever was submitted
 
-            if selected_gender == 'male':
-                selected_gender = 'male'  # Set selected_gender to "male"
-                break  # Exit the loop after updating selected_gender
+        # Store in session
+        session["selected_type"] = selected_type
+        session["selected_gender"] = selected_gender
 
-            if selected_gender == 'female':
-                selected_gender = 'female'  # Set selected_gender to "female"
-                break  # Exit the loop after updating selected_gender
+        print("Type:", selected_type)
+        print("Gender:", selected_gender)
 
-        session["selected_type"] = selected_type  # Store the type in the session
-        session["selected_gender"] = selected_gender  # Store the type in the session
-        print(selected_type)
-        print(selected_gender)
-        return redirect(url_for("main"))  # Redirect to main page after selecting the building
+        return redirect(url_for("main"))  # Redirect after form submission
+
     all_sessions = dict(session)
-    print("This is your dictionary")
+    print("This is your session dictionary:")
     print(all_sessions)
     return render_template("clean_squat_preferences.html")
     

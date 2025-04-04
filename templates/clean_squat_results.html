@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,43 +42,41 @@
         <h1>Results</h1>
 
         {% if result %}
-            {% for row in result %}
-                <div class="field-row">
-                    <label>Building:</label>
-                    <div id="building">{{ row[0] }}</div> <!-- BuildingID -->
-                </div>
-
-                <div class="field-row">
-                    <label>Floor Number:</label>
-                    <div id="floor">{{ row[1] }}</div> <!-- FloorNumber -->
-                </div>
-
-                <div class="field-row">
-                    <label>Room Number:</label>
-                    <div id="room">{{ row[2] }}</div> <!-- RoomNumber -->
-                </div>
-
-                <div class="field-row">
-                    <label>Current Rating:</label>
-                    <div id="rating">{{ row[3] }}</div> <!-- Rating -->
-                </div>
-            {% endfor %}
+        {% for row in result %}
+            <div class="field-row">
+                <label>Building:</label>
+                <div id="building">{{ row[0] }}</div>
+            </div>
+    
+            <div class="field-row">
+                <label>Floor Number:</label>
+                <div id="floor">{{ row[1] }}</div>
+            </div>
+    
+            <div class="field-row">
+                <label>Room Number:</label>
+                <div id="room">{{ row[2] }}</div>
+            </div>
+    
+            <div class="field-row">
+                <label>Current Rating:</label>
+                <div id="rating">{{ row[3] }}</div>
+            </div>
+        {% endfor %}
+    
+        <a href="/rating"><button type="button">Rate This Restroom</button></a>
+        <a href="/report_an_issue"><button type="button">Report an Issue</button></a>
+        <a href="/main"><button type="button">Done</button></a>
+    
+    <!-- {% else %}
+        <p>No matching results found.</p>
+    {% endif %} -->
+    
         
-
-        <a href="/rating">
-            <button type="button">Rate This Restroom</button>
-        </a>
-        <a href="/report_an_issue">    
-            <button type="button">Report an Issue</button>
-        </a>
-        <a href="/main">
-            <button type="submit">Done</button>
-        </a>
     </div>
 </body>
 </html>
-=======
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -152,5 +149,5 @@
         </a>
     </div>
 </body>
-</html>
->>>>>>> fd675ed315d28cf6c9ec7889010158bb01d585b6
+</html> -->
+

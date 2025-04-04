@@ -208,7 +208,7 @@ def rating():
     return render_template("rating.html")
 
 
-#This route renders the page that allows users to report issues with restrooms to staff. 
+# This route renders the page that allows users to report issues with restrooms to staff. 
 # @app.route("/report_an_issue", methods=["GET"])
 # def report_an_issue():
 #     #items = get_all_items() # Call defined function to get all items
@@ -222,7 +222,6 @@ def staff_dashboard():
     return render_template("staff_dash.html")
 
 
-#THIS VIEW FILE IS MISSING
 #This route renders the page that allows staff to view all reported issues.
 @app.route("/staff_issue_portal", methods=["GET"])
 def staff_issue_portal():
@@ -243,7 +242,7 @@ def staff_issue_portal():
     return render_template("staff_issue_portal.html", issues=issues)
 
 
-
+#This view is not rendering currently but I think Kristina might still be working on it - Daniel
 @app.route("/selected_issue/<int:issue_id>", methods=["GET", "POST"])
 def selected_issue(issue_id):
     # Connect to the database
@@ -319,6 +318,9 @@ def report_an_issue():
 
     return render_template("report_an_issue.html")
 
+#Do we need an additional view to display the update issue status? I honestly don't know
+#I think it could be some language on the selected issue route that just sends a ALERT query 
+# to update to completed status and then it runs a SELECT after that to update the page? -Daniel
 @app.route("/update_issue_status/<int:issue_id>/<int:status>", methods=["POST"])
 def update_issue_status(issue_id, status):
     # Connect to the database
@@ -348,7 +350,6 @@ def update_issue_status(issue_id, status):
 
 
 
-#THIS VIEW FILE IS MISSING
 #This route renders the page that allows staff to record which bathroom they have cleaned.
 @app.route("/report_cleaning", methods=["GET"])
 def report_cleaning():

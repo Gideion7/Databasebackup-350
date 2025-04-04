@@ -89,21 +89,24 @@ def get_results():
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    # Base query to join Buildings and PreferencesView
     if selected_gender is None:
         query = """
-        SELECT BuildingID, FloorNumber, RoomNumber, Rating
-        FROM Clean_Squat.PreferencesView
-        WHERE BuildingID = %s AND IsPrivate = %s AND Gender IS NULL
-        ORDER BY CleaningTimeStamp DESC
+        SELECT b.BuildingName, p.FloorNumber, p.RoomNumber, p.Rating
+        FROM Clean_Squat.PreferencesView p
+        JOIN Clean_Squat.BUILDING b ON p.BuildingID = b.BuildingID
+        WHERE p.BuildingID = %s AND p.IsPrivate = %s AND p.Gender IS NULL
+        ORDER BY p.CleaningTimeStamp DESC
         LIMIT 1
         """
         cursor.execute(query, (selected_building_id, selected_type))
     else:
         query = """
-        SELECT BuildingID, FloorNumber, RoomNumber, Rating
-        FROM Clean_Squat.PreferencesView
-        WHERE BuildingID = %s AND IsPrivate = %s AND Gender = %s
-        ORDER BY CleaningTimeStamp DESC
+        SELECT b.BuildingName, p.FloorNumber, p.RoomNumber, p.Rating
+        FROM Clean_Squat.PreferencesView p
+        JOIN Clean_Squat.BUILDING b ON p.BuildingID = b.BuildingID
+        WHERE p.BuildingID = %s AND p.IsPrivate = %s AND p.Gender = %s
+        ORDER BY p.CleaningTimeStamp DESC
         LIMIT 1
         """
         cursor.execute(query, (selected_building_id, selected_type, selected_gender))

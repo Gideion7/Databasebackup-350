@@ -140,6 +140,79 @@ def register():
     #items = get_all_items() # Call defined function to get all items
     return render_template("clean_squat_register.html")  
 
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        try:
+            # Get data from the registration form
+            username = request.form["username"]
+            password = request.form["password"]
+            first_name = request.form["first_name"]
+            last_name = request.form["last_name"]
+            role = request.form["role"]
+
+            # Connect to the database and insert the new user (no password hashing)
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                INSERT INTO Clean_Squat.USER (Username, Password, FirstName, LastName, Role)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (username, password, first_name, last_name, role))  # Password is stored as plain text
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            flash("User registered successfully!", "success")
+            
+            # Optionally, log the user in right after registration by storing the user in the session
+            session['username'] = username  # Store the username in the session
+            return redirect(url_for("index"))  # Redirect to the index page after successful registration
+
+        except mysql.connector.Error as err:
+            flash(f"MySQL Error: {err}", "error")
+            return redirect(url_for("register"))
+        except Exception as e:
+            flash(f"Error: {str(e)}", "error")
+            return redirect(url_for("register"))
+
+    return render_template("register.html")  # Render the registration page
+
+# Login route
+@app.route("/", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        # Connect to the database and check if the user exists
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM Clean_Squat.USER WHERE Username = %s AND Password = %s", (username, password))
+        user = cursor.fetchone()  # Fetch the user details if they exist
+
+        cursor.close()
+        conn.close()
+
+        if user:
+            # Store the user info in session (assuming user[0] is the UserID)
+            session['user_id'] = user[0]
+            flash("Login successful!", "success")
+            return redirect(url_for("index"))  # Redirect to the index page after successful login
+        else:
+            flash("Invalid username or password", "error")
+            return redirect(url_for("login"))  # Stay on login page if credentials are incorrect
+
+    return render_template("index.html")  # Render the login page
+
+@app.route("/logout")
+def logout():
+    session.pop('user_id', None)  # Remove the user_id from the session
+    session.pop('username', None)  # Remove the username from the session
+    flash("You have been logged out.", "success")
+    return redirect(url_for("index"))  # Redirect to the index page after logout
+
 
 #This route renders the main page of our website that allows users to input information to find a restroom or report an issue.
 @app.route("/main", methods=["GET"])

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clean Squat Login</title>
+  <link rel="stylesheet" href="../static/css/styles.css">
+  <style> 
+    .form-container {
+      text-align: center;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h1>Clean Squat</h1>
+    <!-- Update the form action to submit to the /login route -->
+    <form action="{{ url_for('login') }}" method="post">
+      
+      <!-- User Name -->
+      <label for="username">User Name: <input type="text" id="username" name="username" placeholder="Enter your username" required></label>
+      
+      <!-- Password -->
+      <label for="password">Password: <input type="password" id="password" name="password" placeholder="Enter your password" required></label>
+      <br>
+      <!-- Login Button -->
+      <button type="submit">Login</button>
+      <br><br>
+    </form>
+
+    <!-- Link to the register page -->
+    <a href="{{ url_for('register') }}">
+      <button type="button">Register</button>
+    </a>
+  </div>
+
+</body>
+</html>

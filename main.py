@@ -149,10 +149,10 @@ def register():
             password = request.form["password"]
             first_name = request.form["first_name"]
             last_name = request.form["last_name"]
-            role = request.form["role"]
+            
 
             # Print to check if form data is being captured
-            print(f"Registering: {username}, {password}, {first_name}, {last_name}, {role}")
+            print(f"Registering: {username}, {password}, {first_name}, {last_name}")
 
             # Connect to the database and insert the new user (no password hashing)
             conn = get_db_connection()
@@ -160,9 +160,9 @@ def register():
 
             # Insert user data into the database
             cursor.execute("""
-                INSERT INTO Clean_Squat.USER (Username, Password, FirstName, LastName, Role)
-                VALUES (%s, %s, %s, %s, %s)
-            """, (username, password, first_name, last_name, role))  # Password is stored as plain text
+                INSERT INTO Clean_Squat.USER (Username, Password, FirstName, LastName)
+                VALUES (%s, %s, %s, %s)
+            """, (username, password, first_name, last_name))  # Password is stored as plain text
             conn.commit()  # Commit the transaction to save the new user
             cursor.close()
             conn.close()
@@ -205,7 +205,7 @@ def login():
             # Store the user info in session (assuming user[0] is the UserID)
             session['user_id'] = user[0]
             flash("Login successful!", "success")
-            return redirect(url_for("index"))  # Redirect to the index page after successful login
+            return redirect(url_for("main"))  # Redirect to the index page after successful login
         else:
             flash("Invalid username or password", "error")
             return redirect(url_for("login"))  # Stay on login page if credentials are incorrect

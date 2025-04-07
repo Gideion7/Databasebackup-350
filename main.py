@@ -135,10 +135,10 @@ def index():
 
 
 #This route renders the registration page of the website.
-@app.route("/register", methods=["GET"])
-def register():
-    #items = get_all_items() # Call defined function to get all items
-    return render_template("clean_squat_register.html")  
+# @app.route("/register", methods=["GET"])
+# def register():
+#     #items = get_all_items() # Call defined function to get all items
+#     return render_template("clean_squat_register.html")  
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -151,15 +151,19 @@ def register():
             last_name = request.form["last_name"]
             role = request.form["role"]
 
+            # Print to check if form data is being captured
+            print(f"Registering: {username}, {password}, {first_name}, {last_name}, {role}")
+
             # Connect to the database and insert the new user (no password hashing)
             conn = get_db_connection()
             cursor = conn.cursor()
 
+            # Insert user data into the database
             cursor.execute("""
                 INSERT INTO Clean_Squat.USER (Username, Password, FirstName, LastName, Role)
                 VALUES (%s, %s, %s, %s, %s)
             """, (username, password, first_name, last_name, role))  # Password is stored as plain text
-            conn.commit()
+            conn.commit()  # Commit the transaction to save the new user
             cursor.close()
             conn.close()
 
@@ -177,6 +181,8 @@ def register():
             return redirect(url_for("register"))
 
     return render_template("register.html")  # Render the registration page
+
+
 
 # Login route
 @app.route("/", methods=["GET", "POST"])

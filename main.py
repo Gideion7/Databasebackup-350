@@ -249,9 +249,11 @@ def login():
             #flash("Login successful!", "success")
 
             # Redirect based on user role
-            if session['role'] == 'ADMIN':
+            if session['role'] == 'SUPERVISOR':
                 print("Redirecting to Staff Dashboard")  # Debugging
-                return redirect(url_for("staff_dashboard"))  # Redirect to admin dashboard if user is an admin
+                return redirect(url_for("staff_dashboard"))
+            elif session['role'] == 'STAFF': 
+                return redirect(url_for("staff_dashboard")) # Redirect to admin dashboard if user is an admin
             else:
                 print("Redirecting to User Dashboard")  # Debugging
                 return redirect(url_for("main"))  # Redirect to user dashboard if user is a regular user

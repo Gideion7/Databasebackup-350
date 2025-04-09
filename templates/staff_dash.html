@@ -14,13 +14,19 @@
 
     <form action="#" method="post">
       <!-- Report Cleaning Button -->
-      <button type="button">Report Cleaning</button>
+      <a href="{{ url_for('report_cleaning') }}">
+        <button type="button">Report Cleaning</button>
+      </a>
       <br><br>
-      <!-- Issue Portal Button -->
-      <button type="button">Issue Portal</button>
-      <!-- <a href="../issue_report/issue_report.html">
+  
+      <!-- Report Issue Button -->
+      <a href="{{ url_for('staff_issue_portal') }}">
         <button type="button">Issue Portal</button>
-      </a> -->
+      </a>
+      <br><br>
+      <a href="{{ url_for('admin_dashboard') }}">
+        <button type="button">Back to Admin Dashboard</button>
+      </a>
       <br><br>
       <!-- Logout Button -->
       <a href="/">

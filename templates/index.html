@@ -9,10 +9,8 @@
 <body>
 
     <div class="form-container">
-        <h1>Login to Clean Squat</h1>
-
+        <h1>Welcome to Clean Squat</h1>
         
-
         <!-- Login Form -->
         <form action="{{ url_for('login') }}" method="POST">
             <!-- Username -->
@@ -25,6 +23,16 @@
 
             <!-- Submit Button -->
             <button type="submit">Login</button>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        
         </form>
 
         <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>

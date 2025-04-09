@@ -3,71 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Issue Report</title>
-  <!-- Link to the issue_report.css file -->
+  <title>Report an Issue</title>
   <link rel="stylesheet" href="../static/css/styles.css">
 </head>
 <body>
 
   <div class="form-container">
-    <h1>Issue Report</h1>
+    <h1>Report an Issue</h1>
 
-    <form action="#" method="post">
+    <!-- Display Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('report_an_issue') }}" method="post">
+      
       <!-- Building Selection -->
       <label for="building">Select Building:</label>
-      <select id="building" name="building">
-        <option value="CTB">CTB Building</option>
-        <option value="HBLL">HBLL Building</option>
+      <select id="building" name="building_id" required>
+        {% for building in buildings %}
+          <option value="{{ building[0] }}">{{ building[1] }}</option>
+        {% endfor %}
       </select>
+      <br>
 
-      <!-- Floor Number Selection -->
-      <label for="floor">Select Floor Number:</label>
-      <select id="floor" name="floor">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-      </select>
+      <!-- Floor Number Input -->
+      <label for="floor">Enter Floor Number:</label>
+      <input type="number" id="floor" name="floor" required placeholder="Enter floor number">
+      <br>
 
-      <!-- Room Number Selection -->
-      <label for="room">Select Room Number:</label>
-      <select id="room" name="room">
-        <option value="101">101</option>
-        <option value="102">102</option>
-        <option value="103">103</option>
-        <option value="104">104</option>
-        <option value="105">105</option>
-      </select>
+      <!-- Room Number Input -->
+      <label for="room">Enter Room Number:</label>
+      <input type="number" id="room" name="room" required placeholder="Enter room number">
+      <br>
 
-      <!-- Description Box -->
+      <!-- Issue Description -->
       <label for="description">Issue Description:</label>
-      <textarea id="description" name="description" rows="4" placeholder="Describe the issue here..."></textarea>
+      <textarea id="description" name="description" rows="4" placeholder="Describe the issue here..." required></textarea>
+      <br>
 
-      <!-- Submit Button -->
+      <!-- Timestamp -->
+      <label for="timestamp">Timestamp:</label>
+      <input type="datetime-local" id="timestamp" name="timestamp" required>
+      <br>
+
       <button type="submit">Submit Report</button>
+      <br><br>
+      <a href="{{ url_for('main') }}">Back</a>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container">
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            <script>
+                // Redirect to the main page after 2 seconds
+                setTimeout(function() {
+                    window.location.href = "{{ url_for('main') }}";
+                }, 2000);  // Adjust the time (2000ms = 2 seconds)
+            </script>
+        {% endif %}
+    {% endwith %}
     </form>
   </div>
-
-  <script>
-    document.getElementById("issueForm").addEventListener("submit", function(event) {
-      event.preventDefault(); // Prevent actual form submission
-
-      // Get form values
-      let building = document.getElementById("building").value;
-      let floor = document.getElementById("floor").value;
-      let room = document.getElementById("room").value;
-      let description = document.getElementById("description").value.trim();
-
-      // Check if all fields are filled
-      if (building === "" || floor === "" || room === "" || description === "") {
-        alert("Error: Please fill in all fields before submitting.");
-      } else {
-        alert("Submitted successfully!");
-        this.reset(); // Reset the form after successful submission
-      }
-    });
-  </script>
+  
 
 </body>
 </html>

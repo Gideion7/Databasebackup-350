@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cleaning Report List</title>
+    <style>
+        /* Style for the entire body and background */
+        body {
+            background-color: #002e5d; /* Dark blue background for the page */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+        }
+
+        /* Center the content */
+        .container {
+            background-color: #003366; /* Dark blue background for the container */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 40%;
+            max-width: 800px;
+            color: white;
+        }
+
+        /* Heading style */
+        h2 {
+            text-align: center;
+            color: white; /* White color for the heading */
+            margin-bottom: 20px;
+        }
+
+        /* Style for the scrollable box */
+        .scroll-box {
+            width: 100%;
+            max-height: 300px; /* Smaller height for the scroll box */
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 15px;
+            background-color: #2f3b52;
+            border-radius: 5px; /* Smaller border radius */
+        }
+
+        .report-item {
+            padding: 10px;
+            border-bottom: 1px solid #444;
+            margin-bottom: 5px;
+            background-color: #3e4b68;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+        .report-item:last-child {
+            border-bottom: none;
+        }
+
+        .report-item strong {
+            color: #ffeb3b;
+        }
+
+        .report-item span {
+            color: #a5d6a7;
+        }
+
+        /* Style for the back button */
+        .back-button {
+            display: block;
+            margin: 15px auto;
+            padding: 10px 20px;
+            background-color: #F9BF3B;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #e08e2b;
+        }
+
+        
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Cleaning Report List</h2>
+
+        
+        <div class="scroll-box">
+            {% if cleaning_reports %}
+                {% for report in cleaning_reports %}
+                    <div class="report-item">
+                        <strong>Building Name:</strong> <span>{{ report[0] }}</span><br>
+                        <strong>Floor Number:</strong> <span>{{ report[1] }}</span><br>
+                        <strong>Room Number:</strong> <span>{{ report[2] }}</span><br>
+                        <strong>Last Cleaned:</strong> <span>{{ report[3] }}</span><br>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-message">No cleaning reports found.</p>
+            {% endif %}
+        </div>
+
+        <a href="{{ url_for('staff_dashboard') }}" class="back-button">Back to Staff Dashboard</a>
+    </div>
+
+</body>
+</html>

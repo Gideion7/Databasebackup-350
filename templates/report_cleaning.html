@@ -21,26 +21,14 @@
       </select>
       <br>
 
-      <!-- Floor Number Selection -->
-      <label for="floor">Select Floor Number:</label>
-      <select name="floor" required>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-      </select>
+      <!-- Floor Number Input -->
+      <label for="floor">Enter Floor Number:</label>
+      <input type="number" id="floor" name="floor" required placeholder="Enter floor number">
       <br>
 
-      <!-- Room Number Selection -->
-      <label for="room">Select Room Number:</label>
-      <select name="room" required>
-        <option value="101">101</option>
-        <option value="102">102</option>
-        <option value="103">103</option>
-        <option value="104">104</option>
-        <option value="105">105</option>
-      </select>
+<!-- Room Number Input -->
+      <label for="room">Enter Room Number:</label>
+      <input type="number" id="room" name="room" required placeholder="Enter room number">
       <br>
 
       <!-- Timestamp Selection -->
@@ -49,6 +37,23 @@
       <br>
 
       <button type="submit">Submit Report</button>
+
+      <a href="{{ url_for('staff_dashboard') }}">Back</a>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container">
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            <script>
+                // Redirect to the main page after 2 seconds
+                setTimeout(function() {
+                    window.location.href = "{{ url_for('main') }}";
+                }, 2000);  // Adjust the time (2000ms = 2 seconds)
+            </script>
+        {% endif %}
+    {% endwith %}
     </form>
   </div>
 

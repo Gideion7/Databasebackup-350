@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../static/css/styles.css">
 </head>
 <body>
-
+    
     <div class="form-container">
         <h1>Register for Clean Squat</h1>
 
@@ -32,14 +32,23 @@
             <input type="text" id="last_name" name="last_name" placeholder="Enter your last name" required><br>
 
             
-
             <!-- Submit Button -->
             <button type="submit">Register</button>
         </form>
 
         <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
-
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
     </div>
-
+</body>
+</html>
+    </div>
 </body>
 </html>

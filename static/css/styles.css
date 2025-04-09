@@ -69,3 +69,76 @@ body {
   button:hover {
     background-color: #e08e2b;
   }
+
+  /* Style for Flash Messages */
+.flash-messages {
+  margin-top: 10px; /* Add margin to separate from the form */
+  text-align: center;
+}
+
+.flash-message {
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  color: white;
+  font-size: 16px;
+}
+
+.flash-message.error {
+  background-color: #e74c3c; /* Red background for error */
+}
+
+.flash-message.success {
+  background-color: #2ecc71; /* Green background for success */
+}
+
+.flash-message.warning {
+  background-color: #f39c12; /* Yellow background for warning */
+}
+
+/* Style for links */
+a {
+  color: #F9BF3B; /* Yellow color for URLs */
+  text-decoration: none; /* Remove underline from links */
+}
+
+a:hover {
+  text-decoration: underline; /* Underline on hover for better visibility */
+}
+
+a:visited {
+  color: #F9BF3B; /* Keep the yellow color for visited links */
+}
+
+/* Optional: Add hover effect to links */
+a:hover {
+  color: #e08e2b; /* Slightly darker yellow on hover */
+}
+
+
+
+
+
+/* Flash messages styling */
+.alert-container {
+  margin: 20px 0;
+}
+
+.alert {
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  margin-bottom: 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.alert.success {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.alert.error {
+  background-color: #f44336;
+  color: white;
+}

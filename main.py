@@ -103,7 +103,7 @@ def get_results():
     # Base query to join Buildings and PreferencesView
     if selected_gender is None:
         query = """
-        SELECT b.BuildingName, p.FloorNumber, p.RoomNumber, p.Rating
+        SELECT b.BuildingName, p.FloorNumber, p.RoomNumber, p.Rating, p.RestroomID
         FROM Clean_Squat.PreferencesView p
         JOIN Clean_Squat.BUILDING b ON p.BuildingID = b.BuildingID
         WHERE p.BuildingID = %s AND p.IsPrivate = %s AND p.Gender IS NULL
@@ -113,7 +113,7 @@ def get_results():
         cursor.execute(query, (selected_building_id, selected_type))
     else:
         query = """
-        SELECT b.BuildingName, p.FloorNumber, p.RoomNumber, p.Rating
+        SELECT b.BuildingName, p.FloorNumber, p.RoomNumber, p.Rating, p.RestroomID
         FROM Clean_Squat.PreferencesView p
         JOIN Clean_Squat.BUILDING b ON p.BuildingID = b.BuildingID
         WHERE p.BuildingID = %s AND p.IsPrivate = %s AND p.Gender = %s
@@ -123,9 +123,30 @@ def get_results():
         cursor.execute(query, (selected_building_id, selected_type, selected_gender))
 
     result = cursor.fetchall()
+
+    # Save restroom ID to session for later use
+    if result:
+        session["selected_restroom_id"] = result[0][4]
+    
+   # Get average rating for the specific restroom being shown
+    selected_restroom_id = result[0][4]  # Fetch the RestroomID from the result
+
+    query_avg = """
+    SELECT AVG(p.Rating)
+    FROM Clean_Squat.PreferencesView p
+    WHERE p.RestroomID = %s
+    """
+    cursor.execute(query_avg, (selected_restroom_id,))
+    avg_rating = cursor.fetchone()[0]
+
+    # Round average rating to 1 decimal place
+    avg_rating = round(avg_rating, 1)
+
+    # Debug: Print average rating
+    print("DEBUG: Average Rating Retrieved =", avg_rating)
+
     conn.close()
-    print
-    return result
+    return result, avg_rating
 
 
 # ------------------------ END FUNCTIONS ------------------------ #
@@ -335,18 +356,47 @@ def select_preferences():
 @app.route("/results", methods=["GET"])
 @login_required
 def results():
-    results = get_results() # Call defined function to get all results
+    results, avg_ratings = get_results() # Call defined function to get all results
     if not results:
         return redirect(url_for('sorry'))
-    return render_template("clean_squat_results.html", result=results) 
+    return render_template("clean_squat_results.html", result=results, avg_rating=avg_ratings) 
 
 
 #This route renders the rating page, where users can rate the restrooms they visited. 
-@app.route("/rating", methods=["GET"])
+@app.route("/rating", methods=["POST"])
 @login_required
 def rating():
+    rating = request.form.get('rating')
     #items = get_all_items() # Call defined function to get all items
-    return render_template("rating.html")
+     # Get the building ID from session or elsewhere (ensure you have selected building)
+
+    # If no rating is selected, return an error
+    if not rating:
+        flash("Please select a rating.", "error")
+        return redirect(url_for("rating"))
+
+    # Convert rating to an integer
+    rating = int(rating)
+
+    # Update the rating in the database
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+     # Insert the rating into the RATING table
+    query = """
+    UPDATE RATING
+    SET Rating = %s
+    WHERE UserID = %s AND RestroomID = %s
+    """
+    cursor.execute(query, (rating, user_id, restroom_id))
+    conn.commit()
+
+    # Close connection
+    conn.close()
+
+    # Show confirmation message
+    flash("Thank you for your rating!", "success")
+    return redirect(url_for("rating"))
 
 
 # This route renders the page that allows users to report issues with restrooms to staff. 

@@ -467,9 +467,13 @@ def results():
 #     return render_template("results.html", result=result, avg_rating=avg_rating)
 
 
-# @app.route("/sorry")
-# def sorry_page():
-#     return render_template("sorry.html")  # Render the "Sorry" page if no matching result found
+@app.route("/sorry")
+def sorry_page():
+    return render_template("sorry.html")  # Render the "Sorry" page if no matching result found
+
+@app.route("/unauthorized")
+def unauthorized():
+    return render_template("unauthorized.html")  # Render the "Sorry" page if no matching result found
 
 
 #This route renders the rating page, where users can rate the restrooms they visited. 
@@ -526,6 +530,8 @@ def rating():
 @app.route("/staff_dashboard", methods=["GET"])
 @login_required
 def staff_dashboard():
+    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
+        return redirect(url_for('unauthorized'))
     
     #items = get_all_items() # Call defined function to get all items
     return render_template("staff_dash.html")
@@ -535,6 +541,9 @@ def staff_dashboard():
 @app.route("/staff_issue_portal", methods=["GET"])
 @login_required
 def staff_issue_portal():
+    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
+        return redirect(url_for('unauthorized'))
+    
     # Connect to the database
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -556,6 +565,9 @@ def staff_issue_portal():
 # Sample backend code
 @app.route('/selected_issue/<int:issue_id>', methods=['GET'])
 def selected_issue(issue_id):
+    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
+        return redirect(url_for('unauthorized'))
+    
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
@@ -583,6 +595,9 @@ def selected_issue(issue_id):
 @app.route("/report_an_issue", methods=["GET", "POST"])
 @login_required
 def report_an_issue():
+    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
+        return redirect(url_for('unauthorized'))
+    
     # Retrieve query parameters from the URL (GET request)
     building_name = request.args.get("building")
     floor_number = request.args.get("floor")
@@ -678,6 +693,9 @@ def report_an_issue():
 # to update to completed status and then it runs a SELECT after that to update the page? -Daniel
 @app.route("/update_issue_status/<int:issue_id>/<int:status>", methods=["POST"])
 def update_issue_status(issue_id, status):
+    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
+        return redirect(url_for('unauthorized'))
+    
     # Connect to the database
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -706,6 +724,9 @@ def update_issue_status(issue_id, status):
 
 @app.route('/confirm_delete/<int:issue_id>', methods=['GET', 'POST'])
 def confirm_delete(issue_id):
+    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
+        return redirect(url_for('unauthorized'))
+    
     if request.method == 'POST':
         # Redirect to the delete_issue route to actually delete the issue
         return redirect(url_for('delete_issue', issue_id=issue_id))
@@ -714,6 +735,9 @@ def confirm_delete(issue_id):
 
 @app.route('/delete_issue/<int:issue_id>', methods=['POST'])
 def delete_issue(issue_id):
+    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
+        return redirect(url_for('unauthorized'))
+    
     # Delete the issue from the database
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -732,6 +756,9 @@ def delete_issue(issue_id):
 
 @app.route('/cancel_delete')
 def cancel_delete():
+    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
+        return redirect(url_for('unauthorized'))
+    
     # Cancel deletion and return to the staff portal
     return redirect(url_for('staff_issue_portal'))
 
@@ -742,6 +769,9 @@ def cancel_delete():
 @app.route("/report-cleaning", methods=["GET", "POST"])
 @login_required
 def report_cleaning():
+    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
+        return redirect(url_for('unauthorized'))
+    
     # If it's a GET request, retrieve the parameters from the URL query string
     building_name = request.args.get('building_name')
     floor_number = request.args.get('floor_number')
@@ -812,6 +842,9 @@ def report_cleaning():
 @app.route("/cleaning-reports-list", methods=["GET"])
 @login_required
 def cleaning_reports_list():
+    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
+        return redirect(url_for('unauthorized'))
+    
     # Connect to the database to fetch all restrooms with updated cleaning timestamps
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -853,6 +886,9 @@ def cleaning_reports_list():
 # EXAMPLE OF POST REQUEST
 @app.route("/new-item", methods=["POST"])
 def add_item():
+    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
+        return redirect(url_for('sorry_page'))
+    
     try:
         # Get items from the form
         data = request.form

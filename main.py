@@ -399,10 +399,10 @@ def select_preferences():
 
         flash("Preferences Selected!", "success")
 
-        if session.get("role") in ["STAFF", "SUPERVISOR"]:
-            return redirect(url_for("admin_dashboard"))  # Redirect to admin dashboard if the user is staff or supervisor
-        else:
-            return redirect(url_for("main")) # Red  # Redirect after form submission
+        # if session.get("role") in ["STAFF", "SUPERVISOR"]:
+        #     return redirect(url_for("admin_dashboard"))  # Redirect to admin dashboard if the user is staff or supervisor
+        # else:
+        #     return redirect(url_for("main")) # Red  # Redirect after form submission
 
     all_sessions = dict(session)
     print("This is your session dictionary:")
@@ -411,23 +411,65 @@ def select_preferences():
     
 
 
-#This route renders results page of the website, showing users the bathroom that matches their preferences.
-@app.route("/results", methods=["GET"])
-@login_required
-def results():
-    # Check if building and preferences are selected
-    if "selected_building_id" not in session:
-        flash("Please select a building before proceeding.")
-        return redirect(url_for("main"))  # Redirect to select building page
+# #This route renders results page of the website, showing users the bathroom that matches their preferences.
+# @app.route("/results", methods=["GET"])
+# @login_required
+# def results():
+#     # Check if building and preferences are selected
+#     if "selected_building_id" not in session:
+#         flash("Please select a building before proceeding.")
+#         return redirect(url_for("main"))  # Redirect to select building page
 
-    if "selected_type" not in session or "selected_gender" not in session:
-        flash("Please select your preferences before proceeding.")
-        return redirect(url_for("main"))  # Redirect to select preferences page
+#     if "selected_type" not in session or "selected_gender" not in session:
+#         flash("Please select your preferences before proceeding.")
+#         return redirect(url_for("main"))  # Redirect to select preferences page
     
-    results, avg_ratings = get_results() # Call defined function to get all results
-    if not results:
-        return redirect(url_for('sorry'))
-    return render_template("clean_squat_results.html", result=results, avg_rating=avg_ratings)   # Show results for regular users
+#     results, avg_ratings = get_results() # Call defined function to get all results
+#     if not results:
+#         return redirect(url_for('sorry'))
+#     return render_template("clean_squat_results.html", result=results, avg_rating=avg_ratings)   # Show results for regular users
+
+@app.route("/results", methods=["GET", "POST"])
+def results():
+    building_id = request.args.get("building_id")
+    floor = request.args.get("floor")
+    room = request.args.get("room")
+
+    if not building_id or not floor or not room:
+        
+        return redirect(url_for('sorry_page'))  # Redirect to the "sorry" page if missing data
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Query the database with the given building_id, floor, and room number
+    cursor.execute("""
+        SELECT b.BuildingName, r.FloorNumber, r.RoomNumber, r.Rating, r.RestroomID
+        FROM Clean_Squat.RESTROOM r
+        JOIN Clean_Squat.BUILDING b ON r.BuildingID = b.BuildingID
+        WHERE r.BuildingID = %s AND r.FloorNumber = %s AND r.RoomNumber = %s
+    """, (building_id, floor, room))
+
+    result = cursor.fetchall()  # Fetch the results of the query
+    cursor.close()
+    conn.close()
+
+    if not result:
+        # If no matching restroom is found, redirect to the "sorry" page
+        return redirect(url_for('sorry_page'))
+
+    # Calculate the average rating for the restroom if required
+    avg_rating = None
+    if result:
+        # You can calculate the average rating based on your requirement, for example:
+        avg_rating = sum([row[3] for row in result]) / len(result)
+
+    return render_template("results.html", result=result, avg_rating=avg_rating)
+
+
+@app.route("/sorry")
+def sorry_page():
+    return render_template("sorry.html")  # Render the "Sorry" page if no matching result found
 
 
 #This route renders the rating page, where users can rate the restrooms they visited. 
@@ -795,12 +837,12 @@ def cleaning_reports_list():
 
 
 
-#This route renders the page users are taken to if no bathrooms match their preferences.
-@app.route("/sorry", methods=["GET"])
-@login_required
-def sorry():
-    #items = get_all_items() # Call defined function to get all items
-    return render_template("sorry.html")
+# #This route renders the page users are taken to if no bathrooms match their preferences.
+# @app.route("/sorry", methods=["GET"])
+# @login_required
+# def sorry():
+#     #items = get_all_items() # Call defined function to get all items
+#     return render_template("sorry.html")
 
 
 

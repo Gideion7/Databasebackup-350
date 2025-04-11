@@ -281,7 +281,6 @@ def validate_password(password):
 
 
 
-# Login route
 @app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -296,7 +295,6 @@ def login():
         user = cursor.fetchone()  # Fetch the user details if they exist
 
         cursor.close()
-        conn.close()
 
         if user:
             # Store the user info in session (assuming user[0] is the UserID, user[1] is Username, and user[4] is the Role)
@@ -306,14 +304,23 @@ def login():
 
             print(f"User Role: {session['role']}")  # Debugging: Check the role being stored in session
 
-            #flash("Login successful!", "success")
+            # Log the session to the SESSION table
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO Clean_Squat.SESSION (UserID, Timestamp)
+                VALUES (%s, NOW())
+            """, (user[0],))  # Insert the user ID and current timestamp
+
+            conn.commit()  # Commit the transaction
+
+            cursor.close()
 
             # Redirect based on user role
             if session['role'] == 'SUPERVISOR':
                 print("Redirecting to Staff Dashboard")  # Debugging
                 return redirect(url_for("staff_dashboard"))
             elif session['role'] == 'STAFF': 
-                return redirect(url_for("staff_dashboard")) # Redirect to admin dashboard if user is an admin
+                return redirect(url_for("staff_dashboard"))  # Redirect to admin dashboard if user is a staff
             else:
                 print("Redirecting to User Dashboard")  # Debugging
                 return redirect(url_for("main"))  # Redirect to user dashboard if user is a regular user
@@ -323,6 +330,7 @@ def login():
             return redirect(url_for("login"))  # Stay on login page if credentials are incorrect
 
     return render_template("index.html")  # Render the login page
+
 
 @app.route("/admin_dashboard", methods=["GET"])
 
@@ -391,10 +399,10 @@ def select_preferences():
 
         flash("Preferences Selected!", "success")
 
-        # if session.get("role") in ["STAFF", "SUPERVISOR"]:
-        #     return redirect(url_for("admin_dashboard"))  # Redirect to admin dashboard if the user is staff or supervisor
-        # else:
-        #     return redirect(url_for("main")) # Red  # Redirect after form submission
+        if session.get("role") in ["STAFF", "SUPERVISOR"]:
+            return redirect(url_for("admin_dashboard"))  # Redirect to admin dashboard if the user is staff or supervisor
+        else:
+            return redirect(url_for("main")) # Red  # Redirect after form submission
 
     all_sessions = dict(session)
     print("This is your session dictionary:")

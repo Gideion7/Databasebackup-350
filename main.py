@@ -234,6 +234,11 @@ def register():
             flash("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.", "error")
             return redirect(url_for("register"))
         
+        if not validate_username(username):
+            flash("Username must be 1–30 characters and contain only letters, numbers, or underscores.", "error")
+            return redirect(url_for("register"))
+
+        
         # Check if the username already exists
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -282,6 +287,13 @@ def validate_password(password):
     import re
     pattern = re.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$")
     return bool(pattern.match(password))
+
+def validate_username(username):
+    import re
+    # Match only letters, digits, and underscores — 1 to 30 characters
+    pattern = re.compile(r"^[A-Za-z0-9_]{1,30}$")
+    return bool(pattern.fullmatch(username))
+
 
 
 

@@ -165,25 +165,31 @@ def get_results():
     if result:
         session["selected_restroom_id"] = result[0][4]
     
-   # Get average rating for the specific restroom being shown
-    selected_restroom_id = result[0][4]  # Fetch the RestroomID from the result
+    # Get average rating for the specific restroom being shown
+        selected_restroom_id = result[0][4]  # Fetch the RestroomID from the result
 
-    query_avg = """
-    SELECT AVG(p.Rating)
-    FROM Clean_Squat.PreferencesView p
-    WHERE p.RestroomID = %s
-    """
-    cursor.execute(query_avg, (selected_restroom_id,))
-    avg_rating = cursor.fetchone()[0]
+        query_avg = """
+        SELECT AVG(p.Rating)
+        FROM Clean_Squat.PreferencesView p
+        WHERE p.RestroomID = %s
+        """
+        cursor.execute(query_avg, (selected_restroom_id,))
+        avg_rating = cursor.fetchone()[0]
 
-    # Round average rating to 1 decimal place
-    avg_rating = round(avg_rating, 1)
+        # Round average rating to 1 decimal place
+        avg_rating = round(avg_rating, 1)
 
-    # Debug: Print average rating
-    print("DEBUG: Average Rating Retrieved =", avg_rating)
+        # Debug: Print average rating
+        print("DEBUG: Average Rating Retrieved =", avg_rating)
 
-    conn.close()
-    return result, avg_rating
+        conn.close()
+        return result, avg_rating
+    else:
+        conn.close()
+
+        return None, None
+
+
 
 
 
@@ -227,6 +233,19 @@ def register():
         if not validate_password(password):
             flash("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.", "error")
             return redirect(url_for("register"))
+        
+        if not validate_username(username):
+            flash("Username must be 1–30 characters and contain only letters, numbers, or underscores.", "error")
+            return redirect(url_for("register"))
+        
+        if not validate_first_name(first_name):
+            flash("First Name must be 1-30 characters and contain only letters.")
+            return redirect(url_for("register"))
+        
+        if not validate_last_name(last_name):
+            flash("Last Name must be 1-30 characters and contain only letters.")
+            return redirect(url_for("register"))
+
         
         # Check if the username already exists
         conn = get_db_connection()
@@ -277,6 +296,19 @@ def validate_password(password):
     pattern = re.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$")
     return bool(pattern.match(password))
 
+def validate_username(username):
+    import re
+    # Match only letters, digits, and underscores — 1 to 30 characters
+    pattern = re.compile(r"^[A-Za-z0-9_]{1,30}$")
+    return bool(pattern.fullmatch(username))
+
+def validate_first_name(first_name):
+    pattern = re.compile(r"^[A-Za-z]{1,30}$")
+    return bool(pattern.fullmatch(first_name))
+
+def validate_last_name(last_name):
+    pattern = re.compile(r"^[A-Za-z]{1,30}$")
+    return bool(pattern.fullmatch(last_name))
 
 
 
@@ -335,6 +367,8 @@ def login():
 @app.route("/admin_dashboard", methods=["GET"])
 
 def admin_dashboard():
+    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
+        return redirect(url_for('unauthorized'))
     return render_template("admin_dashboard.html")
 
 @app.route("/logout")
@@ -426,8 +460,9 @@ def results():
         return redirect(url_for("main"))  # Redirect to select preferences page
     
     results, avg_ratings = get_results() # Call defined function to get all results
-    if not results:
-        return redirect(url_for('sorry'))
+    if results is None:  # If no results were found
+        flash("The selected building or preferences do not exist.", "error")
+        return redirect(url_for("sorry_page"))
     return render_template("clean_squat_results.html", result=results, avg_rating=avg_ratings)   # Show results for regular users
 
 # @app.route("/results", methods=["GET", "POST"])
@@ -596,8 +631,7 @@ def selected_issue(issue_id):
 @app.route("/report_an_issue", methods=["GET", "POST"])
 @login_required
 def report_an_issue():
-    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
-        return redirect(url_for('unauthorized'))
+    
     
     # Retrieve query parameters from the URL (GET request)
     building_name = request.args.get("building")

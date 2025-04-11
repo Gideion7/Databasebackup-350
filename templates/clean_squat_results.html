@@ -60,13 +60,37 @@
     
             <div class="field-row">
                 <label>Current Rating:</label>
-                <div id="avg_rating">{{ avg_rating }}</div>
+                <div id="rating">{{ row[3] }}</div>
             </div>
+            <a href="/report_an_issue?building={{ row[0] }}&floor={{ row[1] }}&room={{ row[2] }}&rating={{ row[3] }}">
+                <button type="button">Report an Issue</button>
+            </a>
+            <a href="/rating"><button type="button">Rate This Restroom</button></a>
+            
         {% endfor %}
     
-        <a href="/rating"><button type="button">Rate This Restroom</button></a>
-        <a href="/report_an_issue"><button type="button">Report an Issue</button></a>
-        <a href="/main"><button type="button">Done</button></a>
+       
+       
+        
+        
+        <a href="javascript:void(0);" onclick="redirectUser();"><button type="button">Done</button></a>
+
+<script>
+  function redirectUser() {
+    // You can use a hidden element or a session value to check the role in the backend
+    var userRole = '{{ session["role"] }}';  // Assuming you store the user role in session
+
+    if (userRole === 'STAFF' || userRole === 'SUPERVISOR') {
+      window.location.href = '/admin_dashboard';  // Redirect to the admin dashboard
+    } else {
+      window.location.href = '/main';  // Redirect to the main page for normal users
+    }
+  }
+</script>
+
+    
+   
+
     
     <!-- {% else %}
         <p>No matching results found.</p>

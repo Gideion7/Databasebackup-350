@@ -92,6 +92,41 @@ def get_all_building_names_and_ids():
 #     print(result)
 #     return result
 
+# def get_results():
+#     selected_building_id = session['selected_building_id']
+#     selected_type = session['selected_type']
+#     selected_gender = session['selected_gender']
+
+#     conn = get_db_connection()
+#     cursor = conn.cursor()
+
+#     # Base query to join Buildings and PreferencesView
+#     if selected_gender is None:
+#         query = """
+#         SELECT b.BuildingName, p.FloorNumber, p.RoomNumber, p.Rating
+#         FROM Clean_Squat.PreferencesView p
+#         JOIN Clean_Squat.BUILDING b ON p.BuildingID = b.BuildingID
+#         WHERE p.BuildingID = %s AND p.IsPrivate = %s AND p.Gender IS NULL
+#         ORDER BY p.CleaningTimeStamp DESC
+#         LIMIT 1
+#         """
+#         cursor.execute(query, (selected_building_id, selected_type))
+#     else:
+#         query = """
+#         SELECT b.BuildingName, p.FloorNumber, p.RoomNumber, p.Rating
+#         FROM Clean_Squat.PreferencesView p
+#         JOIN Clean_Squat.BUILDING b ON p.BuildingID = b.BuildingID
+#         WHERE p.BuildingID = %s AND p.IsPrivate = %s AND p.Gender = %s
+#         ORDER BY p.CleaningTimeStamp DESC
+#         LIMIT 1
+#         """
+#         cursor.execute(query, (selected_building_id, selected_type, selected_gender))
+
+#     result = cursor.fetchall()
+#     conn.close()
+#     print
+#     return result
+
 def get_results():
     selected_building_id = session['selected_building_id']
     selected_type = session['selected_type']
@@ -123,30 +158,9 @@ def get_results():
         cursor.execute(query, (selected_building_id, selected_type, selected_gender))
 
     result = cursor.fetchall()
-
-    # Save restroom ID to session for later use
-    if result:
-        session["selected_restroom_id"] = result[0][4]
-    
-   # Get average rating for the specific restroom being shown
-    selected_restroom_id = result[0][4]  # Fetch the RestroomID from the result
-
-    query_avg = """
-    SELECT AVG(p.Rating)
-    FROM Clean_Squat.PreferencesView p
-    WHERE p.RestroomID = %s
-    """
-    cursor.execute(query_avg, (selected_restroom_id,))
-    avg_rating = cursor.fetchone()[0]
-
-    # Round average rating to 1 decimal place
-    avg_rating = round(avg_rating, 1)
-
-    # Debug: Print average rating
-    print("DEBUG: Average Rating Retrieved =", avg_rating)
-
     conn.close()
-    return result, avg_rating
+    return result
+
 
 
 # ------------------------ END FUNCTIONS ------------------------ #
@@ -242,6 +256,7 @@ def validate_password(password):
 
 
 
+
 # Login route
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -314,7 +329,14 @@ def select_building():
         selected_building_id = request.form.get("building")  # Get the selected building from the form
         if selected_building_id:
             session["selected_building_id"] = selected_building_id  # Store the building in the session
-        return redirect(url_for("main"))  # Redirect to main page after selecting the building
+        
+        flash("Building Selected!", "success")
+       # Redirect based on role
+        # if session.get("role") in ["STAFF", "SUPERVISOR"]:
+        #     return redirect(url_for("admin_dashboard"))  # Redirect to admin dashboard if the user is staff or supervisor
+        # else:
+        #     return redirect(url_for("main"))  # Red
+        #  Redirect to main page after selecting the building
     list_of_buildings = get_all_building_names_and_ids() # Call defined function to get all items
     
     return render_template("clean_squat_bldg_select.html", buildings=list_of_buildings)  
@@ -343,7 +365,12 @@ def select_preferences():
         print("Type:", selected_type)
         print("Gender:", selected_gender)
 
-        return redirect(url_for("main"))  # Redirect after form submission
+        flash("Preferences Selected!", "success")
+
+        # if session.get("role") in ["STAFF", "SUPERVISOR"]:
+        #     return redirect(url_for("admin_dashboard"))  # Redirect to admin dashboard if the user is staff or supervisor
+        # else:
+        #     return redirect(url_for("main")) # Red  # Redirect after form submission
 
     all_sessions = dict(session)
     print("This is your session dictionary:")
@@ -356,54 +383,26 @@ def select_preferences():
 @app.route("/results", methods=["GET"])
 @login_required
 def results():
-    results, avg_ratings = get_results() # Call defined function to get all results
+    results = get_results()  # Call defined function to get all results
     if not results:
-        return redirect(url_for('sorry'))
-    return render_template("clean_squat_results.html", result=results, avg_rating=avg_ratings) 
+        return redirect(url_for('sorry'))  # Redirect to "sorry" page if no results are found
+
+    # Check the role of the user and redirect accordingly
+ 
+
+    return render_template("clean_squat_results.html", result=results)  # Show results for regular users
 
 
 #This route renders the rating page, where users can rate the restrooms they visited. 
-@app.route("/rating", methods=["POST"])
+@app.route("/rating", methods=["GET"])
 @login_required
 def rating():
-    rating = request.form.get('rating')
     #items = get_all_items() # Call defined function to get all items
-     # Get the building ID from session or elsewhere (ensure you have selected building)
-
-    # If no rating is selected, return an error
-    if not rating:
-        flash("Please select a rating.", "error")
-        return redirect(url_for("rating"))
-
-    # Convert rating to an integer
-    rating = int(rating)
-
-    # Update the rating in the database
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-     # Insert the rating into the RATING table
-    query = """
-    UPDATE RATING
-    SET Rating = %s
-    WHERE UserID = %s AND RestroomID = %s
-    """
-    cursor.execute(query, (rating, user_id, restroom_id))
-    conn.commit()
-
-    # Close connection
-    conn.close()
-
-    # Show confirmation message
-    flash("Thank you for your rating!", "success")
-    return redirect(url_for("rating"))
+    if session.get("role") in ["STAFF", "SUPERVISOR"]:
+        return redirect(url_for("admin_dashboard"))
+    return render_template("rating.html")
 
 
-# This route renders the page that allows users to report issues with restrooms to staff. 
-# @app.route("/report_an_issue", methods=["GET"])
-# def report_an_issue():
-#     #items = get_all_items() # Call defined function to get all items
-#     return render_template("report_an_issue.html")
 
 
 #This route renders the page that allows staff to navigate to two different pages, one to report cleaning, and the other to see reported issues.
@@ -436,101 +435,56 @@ def staff_issue_portal():
 
 
 #This view is not rendering currently but I think Kristina might still be working on it - Daniel
-@app.route("/selected_issue/<int:issue_id>", methods=["GET", "POST"])
-@login_required
+# Sample backend code
+@app.route('/selected_issue/<int:issue_id>', methods=['GET'])
 def selected_issue(issue_id):
-    # Connect to the database
     conn = get_db_connection()
     cursor = conn.cursor()
-
-    # Fetch the issue details
     cursor.execute("""
-        SELECT IssueID, Description, CompletionStatus 
-        FROM Clean_Squat.ISSUEREPORT 
-        WHERE IssueID = %s
+        SELECT i.IssueID, i.Description, i.CompletionStatus, b.BuildingName, p.FloorNumber, p.RoomNumber, i.ReportTimeStamp
+        FROM Clean_Squat.ISSUEREPORT i
+        JOIN Clean_Squat.RESTROOM p ON i.RestroomID = p.RestroomID
+        JOIN Clean_Squat.BUILDING b ON p.BuildingID = b.BuildingID
+        WHERE i.IssueID = %s
     """, (issue_id,))
     issue = cursor.fetchone()
 
+    if issue:
+        timestamp = issue[6]  # This is the timestamp value
+        formatted_timestamp = timestamp.strftime('%B %d, %Y at %I:%M %p')  # Example format: 'December 25, 2021 at 03:30 PM'
+        issue = list(issue)  # Convert tuple to list to modify it
+        issue[6] = formatted_timestamp
     cursor.close()
     conn.close()
 
-    if not issue:
-        flash("Issue not found.", "error")
-        return redirect(url_for('staff_issue_portal'))
-
-    return render_template("selected_issue.html", issue=issue)
+    return render_template('selected_issue.html', issue=issue)
 
 
 
-# @app.route("/report_an_issue", methods=["GET", "POST"])
-
-# def report_an_issue():
-#     if request.method == "POST":
-#         # Get form data
-#         description = request.form["description"]
-#         timestamp = request.form["timestamp"]
-#         building_id = request.form["building_id"]
-#         floor = request.form["floor"]
-#         room = request.form["room"]
-
-#         # Connect to the database
-#         conn = get_db_connection()
-#         cursor = conn.cursor()
-
-#         try:
-#             # Query to get the RestroomID for the selected BuildingID, FloorNumber, and RoomNumber
-#             cursor.execute("""
-#                 SELECT RestroomID 
-#                 FROM Clean_Squat.RESTROOM 
-#                 WHERE BuildingID = %s AND FloorNumber = %s AND RoomNumber = %s
-#             """, (building_id, floor, room))
-#             restroom_id = cursor.fetchone()
-
-#             if not restroom_id:
-#                 # If no RestroomID is found, flash an error message and redirect back to the form
-#                 flash("No matching restroom found for the selected building, floor, and room.", "error")
-#                 return redirect(url_for("report_an_issue"))
-
-#             # Proceed with inserting the issue, using the RestroomID
-#             restroom_id = restroom_id[0]  # Get the actual value of RestroomID
-#             cursor.execute("""
-#                 INSERT INTO Clean_Squat.ISSUEREPORT (Description, CompletionStatus, ReportTimeStamp, RestroomID)
-#                 VALUES (%s, %s, %s, %s)
-#             """, (description, False, timestamp, restroom_id))
-
-#             # Commit the transaction
-#             conn.commit()
-#             flash("Issue reported successfully!", "success")
-#             return redirect(url_for("main"))  # Redirect to the staff issue portal after submission
-
-#         except mysql.connector.Error as err:
-#             flash(f"Error: {err}", "error")
-#             return redirect(url_for("report_an_issue"))
-
-#         finally:
-#             cursor.close()
-#             conn.close()
-
-#     # GET request: Fetch all buildings to display in the dropdown
-#     conn = get_db_connection()
-#     cursor = conn.cursor()
-#     cursor.execute("SELECT BuildingID, BuildingName FROM Clean_Squat.BUILDING")
-#     buildings = cursor.fetchall()  # Fetch all buildings
-#     cursor.close()
-#     conn.close()
-
-#     return render_template("report_an_issue.html", buildings=buildings)
 
 @app.route("/report_an_issue", methods=["GET", "POST"])
 @login_required
 def report_an_issue():
+    # Retrieve query parameters from the URL (GET request)
+    building_name = request.args.get("building")
+    floor_number = request.args.get("floor")
+    room_number = request.args.get("room")
+
+    # Print the query parameters to check their values
+    print(f"GET Parameters: building_name={building_name}, floor_number={floor_number}, room_number={room_number}")
+
     if request.method == "POST":
-        # Get form data
+        # Get form data from POST request (data submitted by the user)
         description = request.form["description"]
         timestamp = request.form["timestamp"]
+
+        # Get hidden form data (values passed from GET request and pre-filled in the form)
         building_id = request.form["building_id"]
         floor = request.form["floor"]
         room = request.form["room"]
+
+        # Print form data to check if the correct values are being passed
+        print(f"POST Form Data: building_id={building_id}, floor={floor}, room={room}")
 
         # Connect to the database
         conn = get_db_connection()
@@ -545,6 +499,9 @@ def report_an_issue():
             """, (building_id, floor, room))
             restroom_id = cursor.fetchone()
 
+            # Print the query result for debugging
+            print(f"RestroomID: {restroom_id}")
+
             if not restroom_id:
                 # If no RestroomID is found, flash an error message and redirect back to the form
                 flash("No matching restroom found for the selected building, floor, and room.", "error")
@@ -555,7 +512,7 @@ def report_an_issue():
             cursor.execute("""
                 INSERT INTO Clean_Squat.ISSUEREPORT (Description, CompletionStatus, ReportTimeStamp, RestroomID)
                 VALUES (%s, %s, %s, %s)
-            """, (description, False, timestamp, restroom_id))
+            """, (description, False, timestamp, restroom_id))  # CompletionStatus is set to False initially
 
             # Commit the transaction
             conn.commit()
@@ -580,7 +537,7 @@ def report_an_issue():
             cursor.close()
             conn.close()
 
-    # GET request: Fetch all buildings to display in the dropdown
+    # GET request: Fetch all buildings to display in the dropdown (if needed)
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT BuildingID, BuildingName FROM Clean_Squat.BUILDING")
@@ -588,7 +545,14 @@ def report_an_issue():
     cursor.close()
     conn.close()
 
-    return render_template("report_an_issue.html", buildings=buildings)
+    # Return the template with the necessary values (building, floor, room, etc.)
+    return render_template(
+        "report_an_issue.html",
+        buildings=buildings,
+        building_name=building_name,
+        floor_number=floor_number,
+        room_number=room_number,
+    )
 
 
 #Do we need an additional view to display the update issue status? I honestly don't know
@@ -622,11 +586,51 @@ def update_issue_status(issue_id, status):
         conn.close()
 
 
+@app.route('/confirm_delete/<int:issue_id>', methods=['GET', 'POST'])
+def confirm_delete(issue_id):
+    if request.method == 'POST':
+        # Redirect to the delete_issue route to actually delete the issue
+        return redirect(url_for('delete_issue', issue_id=issue_id))
+    return render_template('confirm_delete.html', issue_id=issue_id)
 
-#This route renders the page that allows staff to record which bathroom they have cleaned.
+
+@app.route('/delete_issue/<int:issue_id>', methods=['POST'])
+def delete_issue(issue_id):
+    # Delete the issue from the database
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM Clean_Squat.ISSUEREPORT WHERE IssueID = %s", (issue_id,))
+        conn.commit()
+        flash("Issue deleted successfully!", "success")
+    except mysql.connector.Error as err:
+        flash(f"Error: {err}", "error")
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for('staff_issue_portal'))
+
+
+@app.route('/cancel_delete')
+def cancel_delete():
+    # Cancel deletion and return to the staff portal
+    return redirect(url_for('staff_issue_portal'))
+
+
+
+
+
 @app.route("/report-cleaning", methods=["GET", "POST"])
 @login_required
 def report_cleaning():
+    # If it's a GET request, retrieve the parameters from the URL query string
+    building_name = request.args.get('building_name')
+    floor_number = request.args.get('floor_number')
+    room_number = request.args.get('room_number')
+    timestamp = request.args.get('timestamp')
+
+    # If it's a POST request, handle the form submission
     if request.method == "POST":
         # Get data from form submission
         building_id = request.form["building_id"]
@@ -647,32 +651,18 @@ def report_cleaning():
             """, (building_id, floor_number, room_number))
             restroom_id = cursor.fetchone()
 
-            # Check if the RestroomID was found
             if restroom_id:
-                # Update the CleaningTimeStamp of the selected restroom in the RESTROOM table
                 cursor.execute("""
                     UPDATE Clean_Squat.RESTROOM
                     SET CleaningTimeStamp = %s
                     WHERE RestroomID = %s
-                """, (timestamp, restroom_id[0]))  # Use RestroomID to update the correct restroom
-
-                # Commit the transaction to save the changes
+                """, (timestamp, restroom_id[0]))
                 conn.commit()
 
-                # Now insert the cleaning report into the CleaningReport table (logging the cleaning event)
-                cursor.execute("""
-                    INSERT INTO Clean_Squat.CleaningReport (RestroomID, Timestamp)
-                    VALUES (%s, %s)
-                """, (restroom_id[0], timestamp))
-
-                # Commit the transaction for the cleaning report
-                conn.commit()
                 flash("Successfully submitted cleaning report!", "success")
-                # Flash success message after the cleaning report is successfully submitted
-                
             else:
                 flash("No matching restroom found for the selected building, floor, and room.", "error")
-        
+
         except mysql.connector.Error as err:
             flash(f"MySQL Error: {err}", "error")
         except Exception as e:
@@ -682,17 +672,24 @@ def report_cleaning():
             conn.close()
 
         # Redirect to the cleaning reports list page after successful submission
-        return redirect(url_for("cleaning_reports_list"))
+        return redirect(url_for("report_cleaning"))
 
-    # GET request: Fetch all buildings to display in the dropdown
+    # If it's a GET request, render the form with pre-filled values
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT BuildingID, BuildingName FROM Clean_Squat.BUILDING")
-    buildings = cursor.fetchall()  # Fetch all buildings
+    buildings = cursor.fetchall()
     cursor.close()
     conn.close()
 
-    return render_template("report_cleaning.html", buildings=buildings)
+    # Return the template with pre-filled values
+    return render_template("report_cleaning.html", 
+                           buildings=buildings, 
+                           building_name=building_name, 
+                           floor_number=floor_number, 
+                           room_number=room_number, 
+                           timestamp=timestamp)
+
 
 @app.route("/cleaning-reports-list", methods=["GET"])
 @login_required
@@ -703,15 +700,16 @@ def cleaning_reports_list():
 
     # Query to fetch all restrooms, ordered by the most recent cleaning timestamp
     cursor.execute("""
-        SELECT BuildingID, FloorNumber, RoomNumber, 
-            DATE_FORMAT(CleaningTimeStamp, '%m-%d-%y %H:%i:%s') AS CleaningTimeStamp
-        FROM Clean_Squat.RESTROOM
-        ORDER BY CleaningTimeStamp DESC
+    SELECT BuildingID, FloorNumber, RoomNumber, 
+        DATE_FORMAT(CleaningTimeStamp, '%b %d, %Y at %h:%i %p') AS CleaningTimeStamp
+    FROM Clean_Squat.RESTROOM
+    ORDER BY CleaningTimeStamp DESC
     """)
     cleaning_reports = cursor.fetchall()
 
     cursor.close()
     conn.close()
+
 
     if not cleaning_reports:
         flash("No cleaning reports found.", "warning")

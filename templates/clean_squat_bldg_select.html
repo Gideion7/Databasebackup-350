@@ -18,9 +18,31 @@
             </select>
             <button type="submit">Select Building</button>
         </form>
+
+        <!-- Display Flash message -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert-container">
+                    {% for category, message in messages %}
+                        <div class="alert {{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Redirect script after 2 seconds -->
+                <script>
+                    setTimeout(function() {
+                        var userRole = '{{ session["role"] }}'; // Get user role from session
+                        if (userRole === 'STAFF' || userRole === 'SUPERVISOR') {
+                            window.location.href = '{{ url_for("admin_dashboard") }}';  // Redirect to admin dashboard
+                        } else {
+                            window.location.href = '{{ url_for("main") }}';  // Redirect to the main page for normal users
+                        }
+                    }, 1000);  // Wait for 2 seconds before redirecting
+                </script>
+            {% endif %}
+        {% endwith %}
     </div>
 </body>
 </html>
-
-
-

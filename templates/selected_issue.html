@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Issue</title>
+    <title>Issue Report</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
@@ -30,6 +30,10 @@
           Not Completed
         {% endif %}
       </p>
+      <p><strong>Building:</strong> {{ issue[3] }}</p>
+      <p><strong>Floor:</strong> {{ issue[4] }}</p>
+      <p><strong>Room:</strong> {{ issue[5] }}</p>
+      <p><strong>Timestamp:</strong> {{ issue[6] }}</p>
     </div>
 
     <!-- Form to update status -->
@@ -41,6 +45,20 @@
           Mark as Completed
         {% endif %}
       </button>
+    </form>
+
+    <!-- Button to go to the report cleaning form -->
+    <form method="GET" action="{{ url_for('report_cleaning') }}">
+      <input type="hidden" name="building_name" value="{{ issue[3] }}">
+      <input type="hidden" name="floor_number" value="{{ issue[4] }}">
+      <input type="hidden" name="room_number" value="{{ issue[5] }}">
+      <input type="hidden" name="timestamp" value="{{ issue[6] }}">
+
+      <!-- Button in the 'View Issue' page that redirects to 'report_cleaning' with autofill -->
+<a href="{{ url_for('report_cleaning', building_name=issue[3], floor_number=issue[4], room_number=issue[5], timestamp=issue[6]) }}">
+  <button>Report Cleaning</button>
+</a>
+
     </form>
 
     <a href="{{ url_for('staff_issue_portal') }}" class="btn btn-secondary mt-4">Back to Issue Portal</a>

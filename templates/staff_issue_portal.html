@@ -5,13 +5,188 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Issue Portal</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* General Styles */
+        body {
+            background-color: #002e5d; /* Dark blue background for the page */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+        }
+
+        /* Center the content */
+        .form-container {
+            background-color: #003366; /* Dark blue background for the container */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 40%;
+            max-width: 900px;
+            color: white;
+        }
+
+        /* Heading style */
+        h1 {
+            text-align: center;
+            color: white; /* White color for the heading */
+            margin-bottom: 20px;
+        }
+
+        /* Style for the scrollable box */
+        .scroll-box {
+            width: 100%;
+            max-height: 300px; /* Set the height for scroll box */
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 15px;
+            background-color: #2f3b52;
+            border-radius: 5px; /* Smaller border radius */
+        }
+
+        /* Style for table */
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Ensure table rows are close to each other */
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #F9BF3B; /* Yellow background for header */
+            color: white;
+        }
+
+        td {
+            background-color: #3e4b68;
+            color: white;
+        }
+
+        /* Style for delete icon */
+        .delete-button {
+            background: none;
+            border: none;
+            color: red;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 10px;
+        }
+
+        .delete-button i {
+            font-size: 0.9em; /* Larger icon size */
+        }
+
+        /* Align View Issue and Delete Button */
+        .action-buttons {
+            display: flex;
+            align-items: center;
+        }
+
+        .action-buttons a {
+            margin-right: 10px; /* Space between 'View Issue' and delete icon */
+        }
+
+        /* Styling for the confirmation modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4); /* Transparent black background */
+            padding-top: 100px; /* Adjust this to move the modal down a little */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Style for the modal content */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%; /* Adjust width to fit content */
+            max-width: 400px; /* Max width for the modal */
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        /* Header and footer for the modal */
+        .modal-header, .modal-footer {
+            text-align: center;
+        }
+
+        /* Footer buttons styling */
+        .modal-footer button {
+            margin: 10px;
+            padding: 10px 15px;
+            background-color: #F9BF3B;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal-footer button:hover {
+            background-color: #e08e2b;
+        }
+
+        .modal .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .modal .close:hover,
+        .modal .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Style for the Cancel Button */
+        .cancel-button {
+            background-color: #e08e2b; /* Yellow color */
+            color: white;
+        }
+
+        /* Style for the Delete Button */
+        .delete {
+            background-color: red;
+            color: white;
+        }
+
+        /* Hover effect for the buttons */
+        .cancel-button:hover, .delete-button:hover {
+            opacity: 0.8;
+        }
+
+        /* Hide the modal */
+        .modal.hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
   <div class="form-container">
     <h1>Staff Issue Portal</h1>
 
-    <!-- Display Flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         <div class="alert alert-{{ messages[0][0] }}">
@@ -20,51 +195,90 @@
       {% endif %}
     {% endwith %}
 
-    <table>
-      <thead>
-        <tr>
-          <th>Issue ID</th>
-          <th>Description</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for issue in issues %}
+    <div class="scroll-box">
+      <table>
+        <thead>
           <tr>
-            <td>{{ issue[0] }}</td>
-            <td>{{ issue[1] }}</td>
-            <td>
-              {% if issue[2] == 1 %}
-                <span style="color: green;">Completed</span>
-              {% else %}
-                <span style="color: red;">Not Completed</span>
-              {% endif %}
-            </td>
-            <td>
-              <!-- Link to view the issue details -->
-              <a href="{{ url_for('selected_issue', issue_id=issue[0]) }}">View Issue</a>
-              {% if issue[2] == 1 %}
-                <!-- If completed, show a "Mark as Not Completed" button -->
-                <form method="POST" action="{{ url_for('update_issue_status', issue_id=issue[0], status=0) }}">
-                 
-                </form>
-              {% else %}
-                <!-- If not completed, show a "Mark as Completed" button -->
-                <form method="POST" action="{{ url_for('update_issue_status', issue_id=issue[0], status=1) }}">
-                  
-                </form>
-              {% endif %}
-            </td>
+            <th>Issue ID</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Action</th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {% for issue in issues %}
+            <tr>
+              <td>{{ issue[0] }}</td>
+              <td>{{ issue[1] }}</td>
+              <td>
+                {% if issue[2] == 1 %}
+                  <span style="color: #4CAF50;">Completed</span>
+                {% else %}
+                  <span style="color: rgb(253, 52, 52);">Not Completed</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <a href="{{ url_for('selected_issue', issue_id=issue[0]) }}" style="color: #ffeb3b;">View Issue</a>
+
+                  <!-- Delete Button -->
+                  <button class="delete-button" onclick="openModal('{{ issue[0] }}')">
+                    <i class="fas fa-trash-alt"></i> <!-- Trash Icon -->
+                </button>
+                
+
+
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
     <a href="{{ url_for('staff_dashboard') }}">
-      <button type="button">Back to Staff Dashboard</button>
+      <button type="button" style="background-color: #F9BF3B; color: white; padding: 10px 20px; border-radius: 5px; width: 100%; font-size: 16px;">Back to Staff Dashboard</button>
     </a>
-    <br><br>
   </div>
+
+  <!-- Modal for confirmation -->
+  <div id="deleteModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>Are you sure you want to delete this issue?</h2>
+      <div class="modal-buttons">
+        <button class="cancel-button" onclick="closeModal()">Cancel</button>
+        <form id="deleteForm" method="POST" style="display:inline;">
+          <button type="submit" class="delete">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var modal = document.getElementById("deleteModal");
+
+    // Function to open the modal and set the action of the form
+    function openModal(issueId) {
+      modal.style.display = "block";  // Show the modal
+      document.getElementById("deleteForm").action = "/delete_issue/" + issueId; // Set form action with the correct issue ID
+    }
+
+    // Function to close the modal
+    function closeModal() {
+      modal.style.display = "none";  // Hide the modal
+    }
+  </script>
+  <script>
+    // Hide flash message after 2 seconds
+    setTimeout(function() {
+      var flashMessage = document.querySelector('.alert'); // Select the flash message
+      if (flashMessage) {
+        flashMessage.style.display = 'none'; // Hide the flash message
+      }
+    }, 2000); // 2000ms = 2 seconds
+  </script>
+  
 
 </body>
 </html>

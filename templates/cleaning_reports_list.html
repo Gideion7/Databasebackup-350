@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cleaning Report List</title>
     <style>
-        /* Style for the entire body and background */
+        /* General Styles */
         body {
             background-color: #002e5d; /* Dark blue background for the page */
             font-family: Arial, sans-serif;
@@ -17,7 +17,7 @@
             height: 100vh; /* Full viewport height */
         }
 
-        /* Center the content */
+        /* Container Styles */
         .container {
             background-color: #003366; /* Dark blue background for the container */
             padding: 30px;
@@ -47,6 +47,7 @@
             border-radius: 5px; /* Smaller border radius */
         }
 
+        /* Style for report items */
         .report-item {
             padding: 10px;
             border-bottom: 1px solid #444;
@@ -68,24 +69,60 @@
             color: #a5d6a7;
         }
 
-        /* Style for the back button */
-        .back-button {
-            display: block;
-            margin: 15px auto;
+        /* Button styles */
+        .btn {
+            display: inline-block;
             padding: 10px 20px;
-            background-color: #F9BF3B;
+            background-color: #F9BF3B; /* Yellow background */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 16px; /* Adjust font size */
+            text-align: center;
+            cursor: pointer;
+            width: 40%;  /* Make each button take up 40% of the container width */
+        }
+
+        /* Hover effect for buttons */
+        .btn:hover {
+            background-color: #e08e2b; /* Darker yellow on hover */
+        }
+
+        /* Back buttons container */
+        .back-buttons-container {
+            display: flex;
+            justify-content: space-between; /* Spread buttons out */
+            gap: 10px; /* Optional: Add some space between the buttons */
+            margin-top: 20px; /* Add some space from the previous element */
+        }
+        
+        /* Style for flash messages */
+        .flash-messages {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .flash-message {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
             color: white;
             font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
         }
 
-        .back-button:hover {
-            background-color: #e08e2b;
+        .flash-message.error {
+            background-color: #e74c3c; /* Red background for error */
         }
 
-        
+        .flash-message.success {
+            background-color: #2ecc71; /* Green background for success */
+        }
+
+        .flash-message.warning {
+            background-color: #f39c12; /* Yellow background for warning */
+        }
+
     </style>
 </head>
 <body>
@@ -93,7 +130,6 @@
     <div class="container">
         <h2>Cleaning Report List</h2>
 
-        
         <div class="scroll-box">
             {% if cleaning_reports %}
                 {% for report in cleaning_reports %}
@@ -109,7 +145,10 @@
             {% endif %}
         </div>
 
-        <a href="{{ url_for('staff_dashboard') }}" class="back-button">Back to Staff Dashboard</a>
+        <div class="back-buttons-container">
+            <a href="{{ url_for('staff_dashboard') }}" class="btn">Staff Dashboard</a>
+            <a href="{{ url_for('staff_issue_portal') }}" class="btn">Staff Issue Portal</a>
+        </div>
     </div>
 
 </body>

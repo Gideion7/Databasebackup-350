@@ -4,58 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Report Cleaning</title>
-    <!-- Link to the shared CSS file -->
-    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+     
 </head>
 <body>
 
   <div class="form-container">
     <h1>Report Cleaning</h1>
-    <form method="POST">
-      <!-- Building Selection -->
-      <label for="building">Select Building:</label>
+
+    
+    <!-- Cleaning report form -->
+    <form method="POST" action="{{ url_for('report_cleaning') }}">
+      <label for="building_id">Building:</label>
       <select name="building_id" required>
         {% for building in buildings %}
-          <option value="{{ building[0] }}">{{ building[1] }}</option>
+          <option value="{{ building[0] }}" {% if building[1] == building_name %} selected {% endif %}>{{ building[1] }}</option>
         {% endfor %}
       </select>
-      <br>
 
-      <!-- Floor Number Input -->
-      <label for="floor">Enter Floor Number:</label>
-      <input type="number" id="floor" name="floor" required placeholder="Enter floor number">
-      <br>
+      <label for="floor">Floor:</label>
+      <input type="number" name="floor" value="{{ floor_number }}" required>
 
-<!-- Room Number Input -->
-      <label for="room">Enter Room Number:</label>
-      <input type="number" id="room" name="room" required placeholder="Enter room number">
-      <br>
+      <label for="room">Room:</label>
+      <input type="text" name="room" value="{{ room_number }}" required>
 
-      <!-- Timestamp Selection -->
-      <label for="timestamp">Timestamp:</label>
-      <input type="datetime-local" name="timestamp" required>
-      <br>
+      <label for="timestamp">Issue Report Timestamp:</label>
+      <input type="text" id="timestamp" name="timestamp" value="{{ timestamp }}" disabled> <!-- Display timestamp from issue report -->
+      
+      <label for="timestamp">Cleaning Report Timestamp:</label>
+      <input type="datetime-local" name="timestamp" value="{{ timestamp }}" required>
 
-      <button type="submit">Submit Report</button>
-
-      <a href="{{ url_for('staff_dashboard') }}">Back</a>
+      <button type="submit">Submit Cleaning Report</button>
       {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="alert-container">
-                {% for category, message in messages %}
-                    <div class="alert {{ category }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-            <script>
-                // Redirect to the main page after 2 seconds
-                setTimeout(function() {
-                    window.location.href = "{{ url_for('main') }}";
-                }, 2000);  // Adjust the time (2000ms = 2 seconds)
-            </script>
-        {% endif %}
+      {% if messages %}
+        <div class="alert-container">
+          {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+        
+        <script>
+          // Redirect to cleaning reports list after 2 seconds
+          setTimeout(function() {
+            window.location.href = "{{ url_for('cleaning_reports_list') }}";  // Redirect to cleaning reports list page
+          }, 2000);  // 2000ms = 2 seconds
+        </script>
+      {% endif %}
     {% endwith %}
     </form>
+
+    <div class="back-buttons-container">
+      <a href="{{ url_for('cleaning_reports_list') }}" class="btn btn-secondary">Cleaning Reports</a>
+      <a href="{{ url_for('staff_dashboard') }}" class="btn btn-secondary">Staff Dashboard</a>
+    </div>
+    
   </div>
+
+  
 
 </body>
 </html>

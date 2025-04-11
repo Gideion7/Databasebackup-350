@@ -166,3 +166,51 @@ a:hover {
 .back-buttons-container .btn:hover {
   background-color: #e08e2b; /* Darker yellow on hover */
 }
+
+.main-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+/* Flash message styles */
+.flash-message-main {
+  background-color: #f44336;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  width: fit-content;
+  max-width: 80%;
+  margin: 10px auto;
+  word-wrap: break-word; /* ensures long words don’t stretch layout */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Container for the thank you message */
+.thanks-message {
+  background-color: #4CAF50; /* Green background for success */
+  color: white; /* White text for contrast */
+  padding: 20px;
+  border-radius: 10px; /* Rounded corners */
+  font-size: 22px; /* Larger text for visibility */
+  font-weight: bold; /* Make the text bold */
+  text-align: center; /* Center align the text */
+  width: 80%; /* Control the width */
+  margin: 30px auto; /* Center the message and add margin for spacing */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for a 3D effect */
+  transition: transform 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Hover effect to make the message pop */
+.thanks-message:hover {
+  transform: scale(1.05); /* Slightly increase size on hover */
+}
+
+/* Optional: Add an icon next to the message */
+.thanks-message .icon {
+  font-size: 30px; /* Slightly larger icon */
+  margin-right: 10px; /* Add space between icon and text */
+  vertical-align: middle; /* Align icon with text */
+}

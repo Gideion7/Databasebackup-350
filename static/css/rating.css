@@ -1,6 +1,7 @@
+
 /* Center the stars and set the background to dark blue */
 body {
-  background-color: #001f3d; /* Dark blue background */
+  background-color: #002e5d; /* Dark blue background */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -21,7 +22,7 @@ body {
 
 .rating label {
   font-size: 80px;
-  color: #444;
+  color: #6c6a6a;
   cursor: pointer;
   transition: color 0.4s ease-out;
   display: inline-block;
@@ -29,7 +30,7 @@ body {
 
 .rating label:before {
   content: '☆'; /* Unicode star character */
-  font-size: 80px;
+  font-size: 100px;
   transition: color 0.4s ease-out;
 }
 
@@ -52,8 +53,12 @@ body {
   background-color: #F9BF3B;
   border: none;
   color: white;
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
+  width: 200px; /* Set the width of the button */
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 
 #submitBtn:hover {
@@ -65,4 +70,17 @@ body {
   font-size: 18px; /* Adjust the font size */
   margin-top: 20px; /* Add some space between the button and result */
   text-align: center; /* Center align the text */
+}
+
+/* Flash message styles */
+.flash-message {
+  background-color: #f44336; /* Red background for errors */
+  color: white; /* White text for the flash message */
+  padding: 15px;
+  border-radius: 5px;
+  font-size: 20px; /* Increase font size */
+  font-weight: bold; /* Make the text bold */
+  text-align: center; /* Center align the text */
+  width: 80%; /* Add width control to limit the message width */
+  margin: 20px auto; /* Center the flash message */
 }

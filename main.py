@@ -128,6 +128,8 @@ def get_all_building_names_and_ids():
 #     return result
 
 def get_results():
+    
+    
     selected_building_id = session['selected_building_id']
     selected_type = session['selected_type']
     selected_gender = session['selected_gender']
@@ -158,8 +160,30 @@ def get_results():
         cursor.execute(query, (selected_building_id, selected_type, selected_gender))
 
     result = cursor.fetchall()
+
+    # Save restroom ID to session for later use
+    if result:
+        session["selected_restroom_id"] = result[0][4]
+    
+   # Get average rating for the specific restroom being shown
+    selected_restroom_id = result[0][4]  # Fetch the RestroomID from the result
+
+    query_avg = """
+    SELECT AVG(p.Rating)
+    FROM Clean_Squat.PreferencesView p
+    WHERE p.RestroomID = %s
+    """
+    cursor.execute(query_avg, (selected_restroom_id,))
+    avg_rating = cursor.fetchone()[0]
+
+    # Round average rating to 1 decimal place
+    avg_rating = round(avg_rating, 1)
+
+    # Debug: Print average rating
+    print("DEBUG: Average Rating Retrieved =", avg_rating)
+
     conn.close()
-    return result
+    return result, avg_rating
 
 
 
@@ -383,23 +407,66 @@ def select_preferences():
 @app.route("/results", methods=["GET"])
 @login_required
 def results():
-    results = get_results()  # Call defined function to get all results
+    # Check if building and preferences are selected
+    if "selected_building_id" not in session:
+        flash("Please select a building before proceeding.")
+        return redirect(url_for("main"))  # Redirect to select building page
+
+    if "selected_type" not in session or "selected_gender" not in session:
+        flash("Please select your preferences before proceeding.")
+        return redirect(url_for("main"))  # Redirect to select preferences page
+    
+    results, avg_ratings = get_results() # Call defined function to get all results
     if not results:
-        return redirect(url_for('sorry'))  # Redirect to "sorry" page if no results are found
-
-    # Check the role of the user and redirect accordingly
- 
-
-    return render_template("clean_squat_results.html", result=results)  # Show results for regular users
+        return redirect(url_for('sorry'))
+    return render_template("clean_squat_results.html", result=results, avg_rating=avg_ratings)   # Show results for regular users
 
 
 #This route renders the rating page, where users can rate the restrooms they visited. 
-@app.route("/rating", methods=["GET"])
+@app.route("/rating", methods=["GET", "POST"])
 @login_required
 def rating():
-    #items = get_all_items() # Call defined function to get all items
-    if session.get("role") in ["STAFF", "SUPERVISOR"]:
-        return redirect(url_for("admin_dashboard"))
+    if request.method == "POST":
+        rating_value = request.form.get('rating')
+        restroom_id =  session.get("selected_restroom_id") #request.form.get('restroom_id') 
+        user_id = session.get("user_id")
+
+        print(f"POST request received: rating_value={rating_value}, restroom_id={restroom_id}, user_id={user_id}")
+
+        # Only check if rating is missing
+        if not rating_value:
+            flash("Please select a rating before submitting.")
+            return redirect(url_for("rating"))  # Stay on the same page"))
+
+        try:
+            rating_value = int(rating_value)
+            restroom_id = int(restroom_id)
+            if rating_value < 1 or rating_value > 5:
+                flash("Rating must be between 1 and 5.")
+                return redirect(url_for("results"))
+        except ValueError:
+            flash("Invalid rating value.")
+            return redirect(url_for("results"))
+
+        # Handle rating logic
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if the user has already rated this restroom
+         # Always update the rating or insert a new one
+        cursor.execute("""
+            INSERT INTO Clean_Squat.RATING (Rating, UserID, RestroomID) 
+            VALUES (%s, %s, %s) 
+            ON DUPLICATE KEY UPDATE Rating = VALUES(Rating)
+        """, (rating_value, user_id, restroom_id))
+        flash("Thanks for rating!")
+
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for("results"))
+
+    # Handle GET request to show the rating page
     return render_template("rating.html")
 
 

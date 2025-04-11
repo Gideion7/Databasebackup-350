@@ -35,143 +35,70 @@
         .form-container button + button {
             margin-top: 10px;
         }
+
+        .thanks-message {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="form-container">
+        <!-- Flash Message Section -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="thanks-message">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+
         <h1>Results</h1>
 
         {% if result %}
-        {% for row in result %}
-            <div class="field-row">
-                <label>Building:</label>
-                <div id="building">{{ row[0] }}</div>
-            </div>
-    
-            <div class="field-row">
-                <label>Floor Number:</label>
-                <div id="floor">{{ row[1] }}</div>
-            </div>
-    
-            <div class="field-row">
-                <label>Room Number:</label>
-                <div id="room">{{ row[2] }}</div>
-            </div>
-    
-            <div class="field-row">
-                <label>Current Rating:</label>
-                <div id="rating">{{ row[3] }}</div>
-            </div>
-            <a href="/report_an_issue?building={{ row[0] }}&floor={{ row[1] }}&room={{ row[2] }}&rating={{ row[3] }}">
-                <button type="button">Report an Issue</button>
-            </a>
-            <a href="/rating"><button type="button">Rate This Restroom</button></a>
-            
-        {% endfor %}
-    
-       
-       
-        
-        
-        <a href="javascript:void(0);" onclick="redirectUser();"><button type="button">Done</button></a>
+            {% for row in result %}
+                <div class="field-row">
+                    <label>Building:</label>
+                    <div id="building">{{ row[0] }}</div>
+                </div>
 
-<script>
-  function redirectUser() {
-    // You can use a hidden element or a session value to check the role in the backend
-    var userRole = '{{ session["role"] }}';  // Assuming you store the user role in session
+                <div class="field-row">
+                    <label>Floor Number:</label>
+                    <div id="floor">{{ row[1] }}</div>
+                </div>
 
-    if (userRole === 'STAFF' || userRole === 'SUPERVISOR') {
-      window.location.href = '/admin_dashboard';  // Redirect to the admin dashboard
-    } else {
-      window.location.href = '/main';  // Redirect to the main page for normal users
-    }
-  }
-</script>
+                <div class="field-row">
+                    <label>Room Number:</label>
+                    <div id="room">{{ row[2] }}</div>
+                </div>
 
-    
-   
+                <div class="field-row">
+                    <label>Current Rating:</label>
+                    <div id="avg_rating">{{ avg_rating }}</div>
+                </div>
 
-    
-    <!-- {% else %}
-        <p>No matching results found.</p>
-    {% endif %} -->
-    
-        
+                <a href="/report_an_issue?building={{ row[0] }}&floor={{ row[1] }}&room={{ row[2] }}&rating={{ row[3] }}">
+                    <button type="button">Report an Issue</button>
+                </a>
+                <a href="{{ url_for('rating', restroom_id=row[4]) }}">
+                    <button type="button">Rate This Restroom</button>
+                </a>
+                <a href="javascript:void(0);" onclick="redirectUser();">
+                    <button type="button">Done</button>
+                </a>
+            {% endfor %}
+        {% else %}
+            <p>No matching results found.</p>
+        {% endif %}
     </div>
+
+    <script>
+        function redirectUser() {
+            window.location.href = "/main";
+        }
+    </script>
 </body>
 </html>
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Results</title>
-    <link rel="stylesheet" href="../static/css/styles.css">
-    <style>
-        .field-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .field-row label {
-            flex: 1;
-            margin-right: 10px;
-            text-align: left;
-        }
-
-        .field-row div {
-            flex: 2;
-            background-color: #004a7c;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid white;
-        }
-
-        .form-container button {
-            margin-top: 10px;
-        }
-
-        .form-container button + button {
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-    <div class="form-container">
-        <h1>Results</h1>
-
-        <div class="field-row">
-            <label>Building:</label>
-            <div id="building">CTB</div>
-        </div>
-
-        <div class="field-row">
-            <label>Floor Number:</label>
-            <div id="floor">2</div>
-        </div>
-
-        <div class="field-row">
-            <label>Room Number:</label>
-            <div id="room">204</div>
-        </div>
-
-        <div class="field-row">
-            <label>Current Rating:</label>
-            <div id="rating">4.5</div>
-        </div>
-        <a href="/rating">
-        <button type="button">Rate This Restroom</button>
-        </a>
-        <a href="/report_an_issue">    
-        <button type="button">Report an Issue</button>
-        </a>
-        <a href="/main">
-        <button type="submit">Done</button>
-        </a>
-    </div>
-</body>
-</html> -->
-

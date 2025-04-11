@@ -7,7 +7,21 @@
   <link rel="stylesheet" href="../static/css/rating.css">
 </head>
 <body>
+  
+  <!-- Display flash messages -->
+  <div class="flash-messages">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-message">
+          {{ messages[0] }}
+        </div>
+      {% endif %}
+    {% endwith %}
+  </div>
+
   <form action="{{ url_for('rating') }}" method="POST">
+    <!-- Hidden input to store the RestroomID -->
+    <!-- <input type="hidden" name="restroom_id" value="{{ restroom_id }}"> -->
     <div class="rating">
       <input type="radio" id="star5" name="rating" value="5">
       <label for="star5"></label>
@@ -21,7 +35,7 @@
       <label for="star1"></label>
     </div>
 
-    <button id="submitBtn">Submit</button>
+    <button type="submit" id="submitBtn">Submit</button>
 </form>
   <div id="ratingResult"></div>
 </body>

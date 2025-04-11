@@ -237,6 +237,14 @@ def register():
         if not validate_username(username):
             flash("Username must be 1–30 characters and contain only letters, numbers, or underscores.", "error")
             return redirect(url_for("register"))
+        
+        if not validate_first_name(first_name):
+            flash("First Name must be 1-30 characters and contain only letters.")
+            return redirect(url_for("register"))
+        
+        if not validate_last_name(last_name):
+            flash("Last Name must be 1-30 characters and contain only letters.")
+            return redirect(url_for("register"))
 
         
         # Check if the username already exists
@@ -294,7 +302,13 @@ def validate_username(username):
     pattern = re.compile(r"^[A-Za-z0-9_]{1,30}$")
     return bool(pattern.fullmatch(username))
 
+def validate_first_name(first_name):
+    pattern = re.compile(r"^[A-Za-z]{1,30}$")
+    return bool(pattern.fullmatch(first_name))
 
+def validate_last_name(last_name):
+    pattern = re.compile(r"^[A-Za-z]{1,30}$")
+    return bool(pattern.fullmatch(last_name))
 
 
 

@@ -165,25 +165,31 @@ def get_results():
     if result:
         session["selected_restroom_id"] = result[0][4]
     
-   # Get average rating for the specific restroom being shown
-    selected_restroom_id = result[0][4]  # Fetch the RestroomID from the result
+    # Get average rating for the specific restroom being shown
+        selected_restroom_id = result[0][4]  # Fetch the RestroomID from the result
 
-    query_avg = """
-    SELECT AVG(p.Rating)
-    FROM Clean_Squat.PreferencesView p
-    WHERE p.RestroomID = %s
-    """
-    cursor.execute(query_avg, (selected_restroom_id,))
-    avg_rating = cursor.fetchone()[0]
+        query_avg = """
+        SELECT AVG(p.Rating)
+        FROM Clean_Squat.PreferencesView p
+        WHERE p.RestroomID = %s
+        """
+        cursor.execute(query_avg, (selected_restroom_id,))
+        avg_rating = cursor.fetchone()[0]
 
-    # Round average rating to 1 decimal place
-    avg_rating = round(avg_rating, 1)
+        # Round average rating to 1 decimal place
+        avg_rating = round(avg_rating, 1)
 
-    # Debug: Print average rating
-    print("DEBUG: Average Rating Retrieved =", avg_rating)
+        # Debug: Print average rating
+        print("DEBUG: Average Rating Retrieved =", avg_rating)
 
-    conn.close()
-    return result, avg_rating
+        conn.close()
+        return result, avg_rating
+    else:
+        conn.close()
+
+        return None, None
+
+
 
 
 
@@ -425,8 +431,9 @@ def results():
         return redirect(url_for("main"))  # Redirect to select preferences page
     
     results, avg_ratings = get_results() # Call defined function to get all results
-    if not results:
-        return redirect(url_for('sorry'))
+    if results is None:  # If no results were found
+        flash("The selected building or preferences do not exist.", "error")
+        return redirect(url_for("sorry_page"))
     return render_template("clean_squat_results.html", result=results, avg_rating=avg_ratings)   # Show results for regular users
 
 # @app.route("/results", methods=["GET", "POST"])

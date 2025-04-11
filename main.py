@@ -342,6 +342,7 @@ def logout():
     session.pop('user_id', None)  # Remove the user_id from the session
     session.pop('username', None)  # Remove the username from the session
     #flash("You have been logged out.", "success")
+    session.clear()
     return redirect(url_for("index"))  # Redirect to the index page after logout
 
 

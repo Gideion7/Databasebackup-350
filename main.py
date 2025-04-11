@@ -353,6 +353,8 @@ def login():
 @app.route("/admin_dashboard", methods=["GET"])
 
 def admin_dashboard():
+    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
+        return redirect(url_for('unauthorized'))
     return render_template("admin_dashboard.html")
 
 @app.route("/logout")
@@ -614,8 +616,7 @@ def selected_issue(issue_id):
 @app.route("/report_an_issue", methods=["GET", "POST"])
 @login_required
 def report_an_issue():
-    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
-        return redirect(url_for('unauthorized'))
+    
     
     # Retrieve query parameters from the URL (GET request)
     building_name = request.args.get("building")

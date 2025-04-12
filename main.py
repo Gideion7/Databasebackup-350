@@ -11,11 +11,12 @@ load_dotenv()
 
 # Initialize the flask app
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET")
+app.secret_key = os.getenv("SECRET")  # Used to securely sign the session cookie
 
 
 # ------------------------ BEGIN FUNCTIONS ------------------------ #
-# Function to retrieve DB connection
+
+# Establishes and returns a new database connection using credentials from environment variables
 def get_db_connection():
     conn = mysql.connector.connect(
         host=os.getenv("DB_HOST"),
@@ -25,6 +26,8 @@ def get_db_connection():
     )
     return conn
 
+
+# Decorator to ensure a user is logged in before accessing a protected route
 def login_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -34,102 +37,48 @@ def login_required(f):
         return f(*args, **kwargs)
     return wrapper
 
-# Get all items from the "items" table of the db
-# def get_all_items():
-#     # Create a new database connection for each request
-#     conn = get_db_connection()  # Create a new database connection
-#     cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
-#     # Query the db
-#     query = "SELECT name, quantity FROM items"
-#     cursor.execute(query)
-#     # Get result and close
-#     result = cursor.fetchall() # Gets result from query
-#     conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
-#     return result
 
-# def get_all_building_names():
-#     # Create a new database connection for each request
-#     conn = get_db_connection()  # Create a new database connection
-#     cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
-#     # Query the db
-#     query = "SELECT BuildingName FROM BUILDING"
-#     cursor.execute(query)
-#     # Get result and close
-#     result = cursor.fetchall() # Gets result from query
-#     conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
-#     return [row[0] for row in result]
+# Validates password strength: requires at least 8 characters, one uppercase, one lowercase, and one digit
+def validate_password(password):
+    import re
+    pattern = re.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$")
+    return bool(pattern.match(password))
 
+
+# Validates that the username contains only letters, digits, and underscores, and is 1–30 characters long
+def validate_username(username):
+    import re
+    pattern = re.compile(r"^[A-Za-z0-9_]{1,30}$")
+    return bool(pattern.fullmatch(username))
+
+
+# Validates first name: allows only letters, up to 30 characters
+def validate_first_name(first_name):
+    pattern = re.compile(r"^[A-Za-z]{1,30}$")
+    return bool(pattern.fullmatch(first_name))
+
+
+# Validates last name: allows only letters, up to 30 characters
+def validate_last_name(last_name):
+    pattern = re.compile(r"^[A-Za-z]{1,30}$")
+    return bool(pattern.fullmatch(last_name))
+
+
+# Retrieves all building names and their IDs from the database
 def get_all_building_names_and_ids():
-    # Create a new database connection for each request
     conn = get_db_connection()  # Create a new database connection
-    cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
-    # Query the db
+    cursor = conn.cursor()  # Create a cursor to perform queries
     query = "SELECT BuildingID, BuildingName FROM BUILDING"
     cursor.execute(query)
-    # Get result and close
-    result = cursor.fetchall() # Gets result from query
-    conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
+    result = cursor.fetchall()  # Fetch the results of the query
+    conn.close()  # Always close the DB connection to avoid locks
     print('look go')
     print(result)
     return result
-    
-    # return [row[0] for row in result]
 
-# def get_results():
-#     # Create a new database connection for each request
-#     selected_building_id = session['selected_building_id']
-#     selected_type = session['selected_type']
-#     selected_gender = session['selected_gender']
-#     conn = get_db_connection()  # Create a new database connection
-#     cursor = conn.cursor() # Creates a cursor for the connection, you need this to do queries
-#     # Query the db
-#     query = "SELECT BuildingID, FloorNumber, RoomNumber, Rating FROM Clean_Squat.PreferencesView WHERE BuildingID = %s AND IsPrivate = %s AND Gender = %s ORDER BY CleaningTimeStamp DESC LIMIT 1"
-#     cursor.execute(query, (selected_building_id, selected_gender, selected_type))
-#     # Get result and close
-#     result = cursor.fetchall() # Gets result from query
-#     conn.close() # Close the db connection (NOTE: You should do this after each query, otherwise your database may become locked)
-#     print("this is the result:")
-#     print(result)
-#     return result
 
-# def get_results():
-#     selected_building_id = session['selected_building_id']
-#     selected_type = session['selected_type']
-#     selected_gender = session['selected_gender']
-
-#     conn = get_db_connection()
-#     cursor = conn.cursor()
-
-#     # Base query to join Buildings and PreferencesView
-#     if selected_gender is None:
-#         query = """
-#         SELECT b.BuildingName, p.FloorNumber, p.RoomNumber, p.Rating
-#         FROM Clean_Squat.PreferencesView p
-#         JOIN Clean_Squat.BUILDING b ON p.BuildingID = b.BuildingID
-#         WHERE p.BuildingID = %s AND p.IsPrivate = %s AND p.Gender IS NULL
-#         ORDER BY p.CleaningTimeStamp DESC
-#         LIMIT 1
-#         """
-#         cursor.execute(query, (selected_building_id, selected_type))
-#     else:
-#         query = """
-#         SELECT b.BuildingName, p.FloorNumber, p.RoomNumber, p.Rating
-#         FROM Clean_Squat.PreferencesView p
-#         JOIN Clean_Squat.BUILDING b ON p.BuildingID = b.BuildingID
-#         WHERE p.BuildingID = %s AND p.IsPrivate = %s AND p.Gender = %s
-#         ORDER BY p.CleaningTimeStamp DESC
-#         LIMIT 1
-#         """
-#         cursor.execute(query, (selected_building_id, selected_type, selected_gender))
-
-#     result = cursor.fetchall()
-#     conn.close()
-#     print
-#     return result
-
-def get_results():
-    
-    
+# Retrieves the most recent restroom rating based on session filters, and its average rating
+def get_results():    
     selected_building_id = session['selected_building_id']
     selected_type = session['selected_type']
     selected_gender = session['selected_gender']
@@ -137,7 +86,8 @@ def get_results():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Base query to join Buildings and PreferencesView
+    # Construct query based on whether gender is specified
+    # dot notion was used in thses queries to simplify 
     if selected_gender is None:
         query = """
         SELECT b.BuildingName, p.FloorNumber, p.RoomNumber, p.Rating, p.RestroomID
@@ -161,13 +111,12 @@ def get_results():
 
     result = cursor.fetchall()
 
-    # Save restroom ID to session for later use
+    # Save restroom ID to session for future use
     if result:
         session["selected_restroom_id"] = result[0][4]
-    
-    # Get average rating for the specific restroom being shown
-        selected_restroom_id = result[0][4]  # Fetch the RestroomID from the result
+        selected_restroom_id = result[0][4]  # RestroomID to get average rating
 
+        # Query to calculate average rating for the selected restroom
         query_avg = """
         SELECT AVG(p.Rating)
         FROM Clean_Squat.PreferencesView p
@@ -176,60 +125,39 @@ def get_results():
         cursor.execute(query_avg, (selected_restroom_id,))
         avg_rating = cursor.fetchone()[0]
 
-        # Round average rating to 1 decimal place
-        avg_rating = round(avg_rating, 1)
-
-        # Debug: Print average rating
+        avg_rating = round(avg_rating, 1)  # Round average rating to 1 decimal place
         print("DEBUG: Average Rating Retrieved =", avg_rating)
 
         conn.close()
         return result, avg_rating
     else:
         conn.close()
-
-        return None, None
-
-
-
-
-
+        return None, None  # Return None if no restroom found
 # ------------------------ END FUNCTIONS ------------------------ #
 
 
 # ------------------------ BEGIN ROUTES ------------------------ #
-# EXAMPLE OF GET REQUEST
 
-# When looking to display items dynamically, add < , items=items > as an argument in the return render_template()
-# like this: < return render_template("index.html", items=items) >.
-# this will allow jinga2 to take that argument as something it can use to prepare the information it needs to dsiplay.
-
-#This route renders the index page of our website, which is the login page.
+# This route serves as the entry point to the application. It renders the login page.
 @app.route("/", methods=["GET"])
 def index():
-    #items = get_all_items() # Call defined function to get all items
-    return render_template("index.html") 
+    # Renders the index.html template, which includes the login form
+    return render_template("index.html")  
 
 
-#This route renders the registration page of the website.
-# @app.route("/register", methods=["GET"])
-# def register():
-#     #items = get_all_items() # Call defined function to get all items
-#     return render_template("clean_squat_register.html")  
-
-
+# This route handles user registration logic and form rendering.
+# It supports both GET (display form) and POST (process form) methods.
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        # Get data from the registration form
+        # Collect form data submitted by the user
         username = request.form["username"]
         password = request.form["password"]
         first_name = request.form["first_name"]
         last_name = request.form["last_name"]
-        
-        role = "USER"  # Default role for new users
-        print(f"Registering: {username}, {password}, {first_name}, {last_name}")
+        role = "USER"  # Default role for all new registrants
 
-        # Validate the password
+        # Validation logic for form fields
         if not validate_password(password):
             flash("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.", "error")
             return redirect(url_for("register"))
@@ -246,38 +174,34 @@ def register():
             flash("Last Name must be 1-30 characters and contain only letters.")
             return redirect(url_for("register"))
 
-        
-        # Check if the username already exists
+        # Check if the username already exists in the database
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM Clean_Squat.USER WHERE Username = %s", (username,))
-        existing_user = cursor.fetchone()  # Fetch one row if a match is found
+        existing_user = cursor.fetchone()
         
         if existing_user:
             flash("Username already taken. Please choose another username.", "error")
             cursor.close()
             conn.close()
-            return redirect(url_for("register"))  # Return to registration page
+            return redirect(url_for("register"))
 
         try:
-            # Connect to the database and insert the new user
-            conn = get_db_connection()
+            # Insert the new user into the USER table
             cursor = conn.cursor()
-
-            # Insert user data into the database
             cursor.execute("""
                 INSERT INTO Clean_Squat.USER (Username, Password, FirstName, LastName, Role)
                 VALUES (%s, %s, %s, %s, %s)
-            """, (username, password, first_name, last_name, role))  # Password is stored as plain text
-            conn.commit()  # Commit the transaction
+            """, (username, password, first_name, last_name, role))  # NOTE: Storing password in plain text is insecure
+            conn.commit()
             cursor.close()
             conn.close()
 
             flash("User registered successfully!", "success")
 
-            # Log the user in immediately after registration
-            session['username'] = username  # Store the username in the session
-            return redirect(url_for("index"))  # Redirect to the index page after successful registration
+            # Automatically log in the user after successful registration
+            session['username'] = username
+            return redirect(url_for("index"))  # Redirect to login page
 
         except mysql.connector.Error as err:
             flash(f"MySQL Error: {err}", "error")
@@ -286,247 +210,181 @@ def register():
             flash(f"Error: {str(e)}", "error")
             return redirect(url_for("register"))
 
-    return render_template("register.html")  # Render the registration page
+    # If GET request, show the registration form
+    return render_template("register.html")
 
 
-# Password validation function
-def validate_password(password):
-    # Password must be at least 8 characters, contain at least one uppercase letter, one lowercase letter, and one number
-    import re
-    pattern = re.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$")
-    return bool(pattern.match(password))
-
-def validate_username(username):
-    import re
-    # Match only letters, digits, and underscores — 1 to 30 characters
-    pattern = re.compile(r"^[A-Za-z0-9_]{1,30}$")
-    return bool(pattern.fullmatch(username))
-
-def validate_first_name(first_name):
-    pattern = re.compile(r"^[A-Za-z]{1,30}$")
-    return bool(pattern.fullmatch(first_name))
-
-def validate_last_name(last_name):
-    pattern = re.compile(r"^[A-Za-z]{1,30}$")
-    return bool(pattern.fullmatch(last_name))
-
-
-
-
+# This route handles both displaying the login page and processing login form submissions.
 @app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
+        # Get form data
         username = request.form["username"]
         password = request.form["password"]
 
-        # Connect to the database and check if the user exists
+        # Validate credentials against the database
         conn = get_db_connection()
         cursor = conn.cursor()
-
         cursor.execute("SELECT * FROM Clean_Squat.USER WHERE Username = %s AND Password = %s", (username, password))
-        user = cursor.fetchone()  # Fetch the user details if they exist
-
+        user = cursor.fetchone()
         cursor.close()
 
         if user:
-            # Store the user info in session (assuming user[0] is the UserID, user[1] is Username, and user[4] is the Role)
+            # Set user session variables after successful login
             session['user_id'] = user[0]
             session['username'] = user[1]
-            session['role'] = user[5]  # Assuming user[4] is the role column
+            session['role'] = user[5]  # Make sure user[5] is the role column
 
-            print(f"User Role: {session['role']}")  # Debugging: Check the role being stored in session
-
-            # Log the session to the SESSION table
+            # Log session to database
             cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO Clean_Squat.SESSION (UserID, Timestamp)
                 VALUES (%s, NOW())
-            """, (user[0],))  # Insert the user ID and current timestamp
-
-            conn.commit()  # Commit the transaction
-
+            """, (user[0],))
+            conn.commit()
             cursor.close()
 
-            # Redirect based on user role
+            # Role-based redirection
             if session['role'] == 'SUPERVISOR':
-                print("Redirecting to Staff Dashboard")  # Debugging
                 return redirect(url_for("staff_dashboard"))
-            elif session['role'] == 'STAFF': 
-                return redirect(url_for("staff_dashboard"))  # Redirect to admin dashboard if user is a staff
+            elif session['role'] == 'STAFF':
+                return redirect(url_for("staff_dashboard"))
             else:
-                print("Redirecting to User Dashboard")  # Debugging
-                return redirect(url_for("main"))  # Redirect to user dashboard if user is a regular user
-
+                return redirect(url_for("main"))  # Normal user dashboard
         else:
             flash("Invalid username or password", "error")
-            return redirect(url_for("login"))  # Stay on login page if credentials are incorrect
+            return redirect(url_for("login"))
 
-    return render_template("index.html")  # Render the login page
+    # If GET request or failed login, show login page again
+    return render_template("index.html")
 
 
+# This route renders the admin dashboard page, but only for users with the 'STAFF' or 'SUPERVISOR' roles.
 @app.route("/admin_dashboard", methods=["GET"])
-
 def admin_dashboard():
+    # Restrict access to admin roles only
     if session.get('role') not in ['STAFF', 'SUPERVISOR']:
-        return redirect(url_for('unauthorized'))
-    return render_template("admin_dashboard.html")
+        return redirect(url_for('unauthorized'))  # Send unauthorized users away
+    return render_template("admin_dashboard.html")  # Show dashboard
 
+
+# This route logs out the user by clearing all session data.
 @app.route("/logout")
 def logout():
-    session.pop('user_id', None)  # Remove the user_id from the session
-    session.pop('username', None)  # Remove the username from the session
-    #flash("You have been logged out.", "success")
+    # Remove session variables and clear entire session
+    session.pop('user_id', None)
+    session.pop('username', None)
     session.clear()
-    return redirect(url_for("index"))  # Redirect to the index page after logout
+    return redirect(url_for("index"))  # Redirect to login page after logout
 
-
-#This route renders the main page of our website that allows users to input information to find a restroom or report an issue.
+# This route renders the main dashboard after login.
+# It serves as the homepage where users can search for restrooms or report issues.
 @app.route("/main", methods=["GET"])
 @login_required
 def main():
-    #items = get_all_items() # Call defined function to get all items
+    # Placeholder for future logic, e.g., fetching items or status
     return render_template("clean_squat_main.html")
 
 
-#This route renders the select building page of the website.
+# This route lets users select a building from a list.
+# It stores the selected building's ID into the session for later filtering.
 @app.route("/select_building", methods=["GET", "POST"])
 @login_required
 def select_building():
     if request.method == "POST":
-        selected_building_id = request.form.get("building")  # Get the selected building from the form
+        selected_building_id = request.form.get("building")  # Retrieve selected building ID from form
         if selected_building_id:
-            session["selected_building_id"] = selected_building_id  # Store the building in the session
-        
+            session["selected_building_id"] = selected_building_id  # Store in session for use in future queries
         flash("Building Selected!", "success")
-       # Redirect based on role
-        # if session.get("role") in ["STAFF", "SUPERVISOR"]:
-        #     return redirect(url_for("admin_dashboard"))  # Redirect to admin dashboard if the user is staff or supervisor
-        # else:
-        #     return redirect(url_for("main"))  # Red
-        #  Redirect to main page after selecting the building
-    list_of_buildings = get_all_building_names_and_ids() # Call defined function to get all items
     
-    return render_template("clean_squat_bldg_select.html", buildings=list_of_buildings)  
+    # Fetch all building names and IDs from the database to populate the dropdown
+    list_of_buildings = get_all_building_names_and_ids()
+    return render_template("clean_squat_bldg_select.html", buildings=list_of_buildings)
 
 
-#This route renders the restroom prefrences page of the website where users can select the prefrences they want for a restroom.
+# This route allows users to choose restroom preferences such as type and gender.
+# Preferences are stored in the session for later filtering in the results page.
 @app.route("/select_preferences", methods=["GET", "POST"])
 @login_required
 def select_preferences():
     if request.method == "POST":
-        selected_type = request.form.get("type")  # "public" or "private"
-        selected_gender = request.form.get("gender")  # "male", "female", or None
+        selected_type = request.form.get("type")  # Accepts "public" or "private"
+        selected_gender = request.form.get("gender")  # Accepts "male" or "female"
 
-        # Convert selected_type to boolean
+        # Normalize preference data
         if selected_type == "private":
-            selected_type = True
-            selected_gender = None  # Set gender to None if private
+            selected_type = True  # Store as boolean
+            selected_gender = None  # Gender doesn't apply to private restrooms
         elif selected_type == "public":
-            selected_type = False
-            # Gender remains whatever was submitted
+            selected_type = False  # Boolean False means public
 
-        # Store in session
+        # Save preferences into the session
         session["selected_type"] = selected_type
         session["selected_gender"] = selected_gender
 
         print("Type:", selected_type)
         print("Gender:", selected_gender)
-
         flash("Preferences Selected!", "success")
 
-        # if session.get("role") in ["STAFF", "SUPERVISOR"]:
-        #     return redirect(url_for("admin_dashboard"))  # Redirect to admin dashboard if the user is staff or supervisor
-        # else:
-        #     return redirect(url_for("main")) # Red  # Redirect after form submission
-
+    # Debug: Print all current session data for verification
     all_sessions = dict(session)
     print("This is your session dictionary:")
     print(all_sessions)
+
     return render_template("clean_squat_preferences.html")
-    
 
 
-#This route renders results page of the website, showing users the bathroom that matches their preferences.
+# This route displays the restroom options based on the user's selected building and preferences.
 @app.route("/results", methods=["GET"])
 @login_required
 def results():
-    # Check if building and preferences are selected
+    # Validate that necessary selections are in session
     if "selected_building_id" not in session:
         flash("Please select a building before proceeding.")
-        return redirect(url_for("main"))  # Redirect to select building page
+        return redirect(url_for("main"))
 
     if "selected_type" not in session or "selected_gender" not in session:
         flash("Please select your preferences before proceeding.")
-        return redirect(url_for("main"))  # Redirect to select preferences page
+        return redirect(url_for("main"))
     
-    results, avg_ratings = get_results() # Call defined function to get all results
-    if results is None:  # If no results were found
+    # Query the database for matching restrooms and their average ratings
+    results, avg_ratings = get_results()
+    
+    if results is None:
         flash("The selected building or preferences do not exist.", "error")
         return redirect(url_for("sorry_page"))
-    return render_template("clean_squat_results.html", result=results, avg_rating=avg_ratings)   # Show results for regular users
 
-# @app.route("/results", methods=["GET", "POST"])
-# def results():
-#     building_id = request.args.get("building_id")
-#     floor = request.args.get("floor")
-#     room = request.args.get("room")
-
-#     if not building_id or not floor or not room:
-        
-#         return redirect(url_for('sorry_page'))  # Redirect to the "sorry" page if missing data
-
-#     conn = get_db_connection()
-#     cursor = conn.cursor()
-
-#     # Query the database with the given building_id, floor, and room number
-#     cursor.execute("""
-#         SELECT b.BuildingName, r.FloorNumber, r.RoomNumber, r.Rating, r.RestroomID
-#         FROM Clean_Squat.RESTROOM r
-#         JOIN Clean_Squat.BUILDING b ON r.BuildingID = b.BuildingID
-#         WHERE r.BuildingID = %s AND r.FloorNumber = %s AND r.RoomNumber = %s
-#     """, (building_id, floor, room))
-
-#     result = cursor.fetchall()  # Fetch the results of the query
-#     cursor.close()
-#     conn.close()
-
-#     if not result:
-#         # If no matching restroom is found, redirect to the "sorry" page
-#         return redirect(url_for('sorry_page'))
-
-#     # Calculate the average rating for the restroom if required
-#     avg_rating = None
-#     if result:
-#         # You can calculate the average rating based on your requirement, for example:
-#         avg_rating = sum([row[3] for row in result]) / len(result)
-
-#     return render_template("results.html", result=result, avg_rating=avg_rating)
+    return render_template("clean_squat_results.html", result=results, avg_rating=avg_ratings)
 
 
+# This route shows a simple error page if no suitable restrooms were found.
 @app.route("/sorry")
 def sorry_page():
-    return render_template("sorry.html")  # Render the "Sorry" page if no matching result found
+    return render_template("sorry.html")
 
+
+# This route is shown if a user attempts to access a page they are not authorized for.
 @app.route("/unauthorized")
 def unauthorized():
-    return render_template("unauthorized.html")  # Render the "Sorry" page if no matching result found
+    return render_template("unauthorized.html")
 
 
-#This route renders the rating page, where users can rate the restrooms they visited. 
+# This route handles restroom rating submissions.
+# It allows logged-in users to rate restrooms from 1 to 5 and updates the database.
 @app.route("/rating", methods=["GET", "POST"])
 @login_required
 def rating():
     if request.method == "POST":
         rating_value = request.form.get('rating')
-        restroom_id =  session.get("selected_restroom_id") #request.form.get('restroom_id') 
+        restroom_id = session.get("selected_restroom_id")  # Pulled from session, set on selection
         user_id = session.get("user_id")
 
         print(f"POST request received: rating_value={rating_value}, restroom_id={restroom_id}, user_id={user_id}")
 
-        # Only check if rating is missing
+        # Validate input
         if not rating_value:
             flash("Please select a rating before submitting.")
-            return redirect(url_for("rating"))  # Stay on the same page"))
+            return redirect(url_for("rating"))
 
         try:
             rating_value = int(rating_value)
@@ -538,53 +396,47 @@ def rating():
             flash("Invalid rating value.")
             return redirect(url_for("results"))
 
-        # Handle rating logic
+        # Insert or update the rating in the database
         conn = get_db_connection()
         cursor = conn.cursor()
-
-        # Check if the user has already rated this restroom
-         # Always update the rating or insert a new one
         cursor.execute("""
             INSERT INTO Clean_Squat.RATING (Rating, UserID, RestroomID) 
             VALUES (%s, %s, %s) 
             ON DUPLICATE KEY UPDATE Rating = VALUES(Rating)
         """, (rating_value, user_id, restroom_id))
-        flash("Thanks for rating!")
 
         conn.commit()
         conn.close()
 
+        flash("Thanks for rating!")
         return redirect(url_for("results"))
-
-    # Handle GET request to show the rating page
+    # Render rating page on GET request
     return render_template("rating.html")
 
-
-
-
-#This route renders the page that allows staff to navigate to two different pages, one to report cleaning, and the other to see reported issues.
+# This route renders the dashboard page for staff and supervisors.
+# It provides navigation to other functionalities like cleaning reports and viewing reported issues.
 @app.route("/staff_dashboard", methods=["GET"])
 @login_required
 def staff_dashboard():
+    # Only allow users with STAFF or SUPERVISOR role to access this page
     if session.get('role') not in ['STAFF', 'SUPERVISOR']:
         return redirect(url_for('unauthorized'))
     
-    #items = get_all_items() # Call defined function to get all items
     return render_template("staff_dash.html")
 
 
-#This route renders the page that allows staff to view all reported issues.
+# This route allows staff/supervisors to view all reported restroom issues.
+# It pulls issue descriptions and their completion statuses from the database and displays them.
 @app.route("/staff_issue_portal", methods=["GET"])
 @login_required
 def staff_issue_portal():
     if session.get('role') not in ['STAFF', 'SUPERVISOR']:
         return redirect(url_for('unauthorized'))
     
-    # Connect to the database
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Get all issues, including their updated status
+    # Fetch all reported issues with their current completion status
     cursor.execute("""
         SELECT IssueID, Description, CompletionStatus
         FROM Clean_Squat.ISSUEREPORT
@@ -597,15 +449,17 @@ def staff_issue_portal():
     return render_template("staff_issue_portal.html", issues=issues)
 
 
-#This view is not rendering currently but I think Kristina might still be working on it - Daniel
-# Sample backend code
+# This route displays a detailed view of a selected issue.
+# It includes building name, room, floor, and timestamp details.
 @app.route('/selected_issue/<int:issue_id>', methods=['GET'])
 def selected_issue(issue_id):
     if session.get('role') not in ['STAFF', 'SUPERVISOR']:
         return redirect(url_for('unauthorized'))
-    
+
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    # Join issue, restroom, and building data for more contextual detail
     cursor.execute("""
         SELECT i.IssueID, i.Description, i.CompletionStatus, b.BuildingName, p.FloorNumber, p.RoomNumber, i.ReportTimeStamp
         FROM Clean_Squat.ISSUEREPORT i
@@ -615,51 +469,41 @@ def selected_issue(issue_id):
     """, (issue_id,))
     issue = cursor.fetchone()
 
+    # Format timestamp for a cleaner UI
     if issue:
-        timestamp = issue[6]  # This is the timestamp value
-        formatted_timestamp = timestamp.strftime('%B %d, %Y at %I:%M %p')  # Example format: 'December 25, 2021 at 03:30 PM'
-        issue = list(issue)  # Convert tuple to list to modify it
+        timestamp = issue[6]
+        formatted_timestamp = timestamp.strftime('%B %d, %Y at %I:%M %p')
+        issue = list(issue)
         issue[6] = formatted_timestamp
+
     cursor.close()
     conn.close()
 
     return render_template('selected_issue.html', issue=issue)
 
 
-
-
+# This route allows users to report an issue in a specific restroom.
+# It handles both GET (show form) and POST (submit issue) requests.
 @app.route("/report_an_issue", methods=["GET", "POST"])
 @login_required
 def report_an_issue():
-    
-    
-    # Retrieve query parameters from the URL (GET request)
+    # For GET requests, capture any location pre-filled from a previous page
     building_name = request.args.get("building")
     floor_number = request.args.get("floor")
     room_number = request.args.get("room")
 
-    # Print the query parameters to check their values
-    print(f"GET Parameters: building_name={building_name}, floor_number={floor_number}, room_number={room_number}")
-
     if request.method == "POST":
-        # Get form data from POST request (data submitted by the user)
         description = request.form["description"]
         timestamp = request.form["timestamp"]
-
-        # Get hidden form data (values passed from GET request and pre-filled in the form)
         building_id = request.form["building_id"]
         floor = request.form["floor"]
         room = request.form["room"]
 
-        # Print form data to check if the correct values are being passed
-        print(f"POST Form Data: building_id={building_id}, floor={floor}, room={room}")
-
-        # Connect to the database
         conn = get_db_connection()
         cursor = conn.cursor()
 
         try:
-            # Query to get the RestroomID for the selected BuildingID, FloorNumber, and RoomNumber
+            # Find the restroom matching the building, floor, and room number
             cursor.execute("""
                 SELECT RestroomID 
                 FROM Clean_Squat.RESTROOM 
@@ -667,53 +511,40 @@ def report_an_issue():
             """, (building_id, floor, room))
             restroom_id = cursor.fetchone()
 
-            # Print the query result for debugging
-            print(f"RestroomID: {restroom_id}")
-
             if not restroom_id:
-                # If no RestroomID is found, flash an error message and redirect back to the form
                 flash("No matching restroom found for the selected building, floor, and room.", "error")
                 return redirect(url_for("report_an_issue"))
 
-            # Proceed with inserting the issue, using the RestroomID
-            restroom_id = restroom_id[0]  # Get the actual value of RestroomID
+            # Insert issue report linked to the found restroom
             cursor.execute("""
                 INSERT INTO Clean_Squat.ISSUEREPORT (Description, CompletionStatus, ReportTimeStamp, RestroomID)
                 VALUES (%s, %s, %s, %s)
-            """, (description, False, timestamp, restroom_id))  # CompletionStatus is set to False initially
+            """, (description, False, timestamp, restroom_id[0]))
 
-            # Commit the transaction
             conn.commit()
-
-            # Flash success message after the cleaning report is successfully submitted
             flash("Successfully submitted issue report!", "success")
-
-            # Redirect to the same page after successful submission, so the user stays on the page with the flash message
             return redirect(url_for("report_an_issue"))
 
         except mysql.connector.Error as err:
-            # Catch MySQL errors
-            flash(f"An error occurred while submitting the issue: {err}", "error")
+            flash(f"MySQL Error: {err}", "error")
             return redirect(url_for("report_an_issue"))
 
         except Exception as e:
-            # Catch general exceptions
-            flash(f"An unexpected error occurred: {str(e)}", "error")
+            flash(f"Unexpected error: {str(e)}", "error")
             return redirect(url_for("report_an_issue"))
 
         finally:
             cursor.close()
             conn.close()
 
-    # GET request: Fetch all buildings to display in the dropdown (if needed)
+    # GET request: fetch building list for dropdown selection
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT BuildingID, BuildingName FROM Clean_Squat.BUILDING")
-    buildings = cursor.fetchall()  # Fetch all buildings
+    buildings = cursor.fetchall()
     cursor.close()
     conn.close()
 
-    # Return the template with the necessary values (building, floor, room, etc.)
     return render_template(
         "report_an_issue.html",
         buildings=buildings,
@@ -723,33 +554,29 @@ def report_an_issue():
     )
 
 
-#Do we need an additional view to display the update issue status? I honestly don't know
-#I think it could be some language on the selected issue route that just sends a ALERT query 
-# to update to completed status and then it runs a SELECT after that to update the page? -Daniel
+# This route is used by staff/supervisors to mark an issue as resolved or unresolved.
+# It is triggered by a form POST action from the issue portal.
 @app.route("/update_issue_status/<int:issue_id>/<int:status>", methods=["POST"])
 def update_issue_status(issue_id, status):
     if session.get('role') not in ['STAFF', 'SUPERVISOR']:
         return redirect(url_for('unauthorized'))
-    
-    # Connect to the database
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
     try:
-        # Update the issue status in the database
         cursor.execute("""
             UPDATE Clean_Squat.ISSUEREPORT 
             SET CompletionStatus = %s 
             WHERE IssueID = %s
         """, (status, issue_id))
 
-        # Commit the changes
         conn.commit()
         flash("Issue status updated successfully!", "success")
-        return redirect(url_for("staff_issue_portal"))  # Redirect back to the staff issue portal
+        return redirect(url_for("staff_issue_portal"))
 
     except mysql.connector.Error as err:
-        flash(f"Error: {err}", "error")
+        flash(f"Database Error: {err}", "error")
         return redirect(url_for("staff_issue_portal"))
 
     finally:
@@ -757,26 +584,32 @@ def update_issue_status(issue_id, status):
         conn.close()
 
 
+# This route shows a confirmation page before deleting an issue.
+# It prevents accidental deletions by requiring an explicit POST confirmation.
 @app.route('/confirm_delete/<int:issue_id>', methods=['GET', 'POST'])
 def confirm_delete(issue_id):
     if session.get('role') not in ['STAFF', 'SUPERVISOR']:
         return redirect(url_for('unauthorized'))
-    
+
     if request.method == 'POST':
-        # Redirect to the delete_issue route to actually delete the issue
+        # User confirmed deletion – redirect to the actual deletion route
         return redirect(url_for('delete_issue', issue_id=issue_id))
+    
+    # Render confirmation page with the selected issue_id
     return render_template('confirm_delete.html', issue_id=issue_id)
 
 
+# This route performs the deletion of the issue from the database.
+# It can only be accessed via POST for safety.
 @app.route('/delete_issue/<int:issue_id>', methods=['POST'])
 def delete_issue(issue_id):
     if session.get('role') not in ['STAFF', 'SUPERVISOR']:
         return redirect(url_for('unauthorized'))
-    
-    # Delete the issue from the database
+
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
+        # Delete the issue from the ISSUEREPORT table
         cursor.execute("DELETE FROM Clean_Squat.ISSUEREPORT WHERE IssueID = %s", (issue_id,))
         conn.commit()
         flash("Issue deleted successfully!", "success")
@@ -789,44 +622,41 @@ def delete_issue(issue_id):
     return redirect(url_for('staff_issue_portal'))
 
 
+# This route allows the user to cancel deletion and return to the staff portal.
 @app.route('/cancel_delete')
 def cancel_delete():
     if session.get('role') not in ['STAFF', 'SUPERVISOR']:
         return redirect(url_for('unauthorized'))
     
-    # Cancel deletion and return to the staff portal
     return redirect(url_for('staff_issue_portal'))
 
 
-
-
-
+# This route allows staff/supervisors to submit a cleaning report for a restroom.
+# It accepts pre-filled location values via GET and form submission via POST.
 @app.route("/report-cleaning", methods=["GET", "POST"])
 @login_required
 def report_cleaning():
     if session.get('role') not in ['STAFF', 'SUPERVISOR']:
         return redirect(url_for('unauthorized'))
-    
-    # If it's a GET request, retrieve the parameters from the URL query string
+
+    # Pre-fill values in form via query parameters
     building_name = request.args.get('building_name')
     floor_number = request.args.get('floor_number')
     room_number = request.args.get('room_number')
     timestamp = request.args.get('timestamp')
 
-    # If it's a POST request, handle the form submission
     if request.method == "POST":
-        # Get data from form submission
+        # Get form data submitted by the user
         building_id = request.form["building_id"]
         floor_number = request.form["floor"]
         room_number = request.form["room"]
         timestamp = request.form["timestamp"]
 
-        # Connect to the database
         conn = get_db_connection()
         cursor = conn.cursor()
 
         try:
-            # Query to get RestroomID for the selected BuildingID, FloorNumber, and RoomNumber
+            # Retrieve restroom ID using the submitted details
             cursor.execute("""
                 SELECT RestroomID 
                 FROM Clean_Squat.RESTROOM 
@@ -835,6 +665,7 @@ def report_cleaning():
             restroom_id = cursor.fetchone()
 
             if restroom_id:
+                # Update the CleaningTimeStamp for the identified restroom
                 cursor.execute("""
                     UPDATE Clean_Squat.RESTROOM
                     SET CleaningTimeStamp = %s
@@ -854,10 +685,9 @@ def report_cleaning():
             cursor.close()
             conn.close()
 
-        # Redirect to the cleaning reports list page after successful submission
         return redirect(url_for("report_cleaning"))
 
-    # If it's a GET request, render the form with pre-filled values
+    # GET request: Fetch buildings for dropdown selection
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT BuildingID, BuildingName FROM Clean_Squat.BUILDING")
@@ -865,85 +695,49 @@ def report_cleaning():
     cursor.close()
     conn.close()
 
-    # Return the template with pre-filled values
-    return render_template("report_cleaning.html", 
-                           buildings=buildings, 
-                           building_name=building_name, 
-                           floor_number=floor_number, 
-                           room_number=room_number, 
-                           timestamp=timestamp)
+    return render_template(
+        "report_cleaning.html",
+        buildings=buildings,
+        building_name=building_name,
+        floor_number=floor_number,
+        room_number=room_number,
+        timestamp=timestamp
+    )
 
 
+# This route displays a list of all restrooms with their latest cleaning timestamps.
+# Useful for staff/supervisors to track maintenance history.
 @app.route("/cleaning-reports-list", methods=["GET"])
 @login_required
 def cleaning_reports_list():
     if session.get('role') not in ['STAFF', 'SUPERVISOR']:
         return redirect(url_for('unauthorized'))
-    
-    # Connect to the database to fetch all restrooms with updated cleaning timestamps
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Query to fetch all restrooms, ordered by the most recent cleaning timestamp
+    # Fetch restroom cleaning records, formatted nicely for display
     cursor.execute("""
-    SELECT BuildingID, FloorNumber, RoomNumber, 
-        DATE_FORMAT(CleaningTimeStamp, '%b %d, %Y at %h:%i %p') AS CleaningTimeStamp
-    FROM Clean_Squat.RESTROOM
-    ORDER BY CleaningTimeStamp DESC
+        SELECT BuildingID, FloorNumber, RoomNumber, 
+               DATE_FORMAT(CleaningTimeStamp, '%b %d, %Y at %h:%i %p') AS CleaningTimeStamp
+        FROM Clean_Squat.RESTROOM
+        ORDER BY CleaningTimeStamp DESC
     """)
     cleaning_reports = cursor.fetchall()
 
     cursor.close()
     conn.close()
 
-
     if not cleaning_reports:
         flash("No cleaning reports found.", "warning")
 
     return render_template("cleaning_reports_list.html", cleaning_reports=cleaning_reports)
 
-
-
-
-
-# #This route renders the page users are taken to if no bathrooms match their preferences.
-# @app.route("/sorry", methods=["GET"])
-# @login_required
-# def sorry():
-#     #items = get_all_items() # Call defined function to get all items
-#     return render_template("sorry.html")
-
-
-
-
-
-
-# EXAMPLE OF POST REQUEST
-@app.route("/new-item", methods=["POST"])
-def add_item():
-    if session.get('role') not in ['STAFF', 'SUPERVISOR']:
-        return redirect(url_for('sorry_page'))
-    
-    try:
-        # Get items from the form
-        data = request.form
-        item_name = data["name"] # This is defined in the input element of the HTML form on index.html
-        item_quantity = data["quantity"] # This is defined in the input element of the HTML form on index.html
-
-        # TODO: Insert this data into the database
-        
-        # Send message to page. There is code in index.html that checks for these messages
-        flash("Item added successfully", "success")
-        # Redirect to home. This works because the home route is named home in this file
-        return redirect(url_for("home"))
-
-    # If an error occurs, this code block will be called
-    except Exception as e:
-        flash(f"An error occurred: {str(e)}", "error") # Send the error message to the web page
-        return redirect(url_for("home")) # Redirect to home
 # ------------------------ END ROUTES ------------------------ #
 
-
-# listen on port 8080
+# Application entry point.
+# The app listens on all interfaces at port 8080.
+# `debug=True` enables automatic reload on code changes and better error messages.
+# IMPORTANT: debug=True SHOULD BE REMOVED IN PRODUCTION
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080, debug=True) # TODO: Students PLEASE remove debug=True when you deploy this for production!!!!!
+    app.run(host="0.0.0.0", port=8080, debug=True)  # TODO: REMOVE debug=True IN PRODUCTION!

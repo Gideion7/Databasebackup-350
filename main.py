@@ -138,13 +138,6 @@ def get_results():
 
 # ------------------------ BEGIN ROUTES ------------------------ #
 
-# This route serves as the entry point to the application. It renders the login page.
-@app.route("/", methods=["GET"])
-def index():
-    # Renders the index.html template, which includes the login form
-    return render_template("index.html")  
-
-
 # This route handles user registration logic and form rendering.
 # It supports both GET (display form) and POST (process form) methods.
 @app.route("/register", methods=["GET", "POST"])

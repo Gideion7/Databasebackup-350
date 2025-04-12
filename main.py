@@ -740,4 +740,4 @@ def cleaning_reports_list():
 # `debug=True` enables automatic reload on code changes and better error messages.
 # IMPORTANT: debug=True SHOULD BE REMOVED IN PRODUCTION
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080, debug=True)  # TODO: REMOVE debug=True IN PRODUCTION!
+    app.run(host="0.0.0.0", port=8080)  # TODO: REMOVE debug=True IN PRODUCTION!

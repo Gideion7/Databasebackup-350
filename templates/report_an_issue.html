@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Report an Issue</title>
-  <link rel="stylesheet" href="../static/css/styles.css">
+  <meta charset="UTF-8"> <!-- Character encoding for the document -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensures responsiveness on different devices -->
+  <title>Report an Issue</title> <!-- Title of the page -->
+  <link rel="stylesheet" href="../static/css/styles.css"> <!-- Link to external stylesheet -->
 </head>
 <body>
 
-  <div class="form-container">
-    <h1>Report an Issue</h1>
+  <div class="form-container"> <!-- Container for the form -->
+    <h1>Report an Issue</h1> <!-- Heading for the form -->
 
-    <form action="{{ url_for('report_an_issue') }}" method="post">
+    <!-- Issue Reporting Form -->
+    <form action="{{ url_for('report_an_issue') }}" method="post"> <!-- Form that sends data to the 'report_an_issue' route -->
       
-      <!-- Building Selection -->
+      <!-- Building Selection Dropdown -->
       <label for="building">Select Building:</label>
-      <select id="building" name="building_id" required>
+      <select id="building" name="building_id" required> <!-- Dropdown for selecting a building -->
         {% for building in buildings %}
           <option value="{{ building[0] }}" {% if building[1] == building_name %}selected{% endif %}>{{ building[1] }}</option>
         {% endfor %}
@@ -24,89 +25,80 @@
 
       <!-- Floor Number Input -->
       <label for="floor">Enter Floor Number:</label>
-      <input type="number" id="floor" name="floor" value="{{ floor_number }}" required placeholder="Enter floor number">
+      <input type="number" id="floor" name="floor" value="{{ floor_number }}" required placeholder="Enter floor number"> <!-- Input for floor number -->
       <br>
 
       <!-- Room Number Input -->
       <label for="room">Enter Room Number:</label>
-      <input type="text" id="room" name="room" value="{{ room_number }}" required placeholder="Enter room number" pattern="[A-Za-z0-9]+" title="Room number should only contain letters and numbers">
+      <input type="text" id="room" name="room" value="{{ room_number }}" required placeholder="Enter room number" pattern="[A-Za-z0-9]+" title="Room number should only contain letters and numbers"> <!-- Input for room number -->
       <br>
 
-      <!-- Issue Description -->
+      <!-- Issue Description Textarea -->
       <label for="description">Issue Description:</label>
-      <textarea id="description" name="description" rows="4" placeholder="Describe the issue here..." required></textarea>
+      <textarea id="description" name="description" rows="4" placeholder="Describe the issue here..." required></textarea> <!-- Textarea for issue description -->
       <br>
 
-      <!-- Timestamp -->
+      <!-- Timestamp Input -->
       <label for="timestamp">Timestamp:</label>
-      <input type="datetime-local" id="timestamp" name="timestamp" required>
+      <input type="datetime-local" id="timestamp" name="timestamp" required> <!-- Input for timestamp of the report -->
       <br>
 
+      <!-- Submit Button -->
       <button type="submit">Submit Report</button>
-      
 
+      <!-- Flash Messages Display -->
       {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-          <div class="alert-container">
-              {% for category, message in messages %}
-                  <div class="alert {{ category }}">{{ message }}</div>
-              {% endfor %}
+        {% if messages %}
+          <div class="alert-container"> <!-- Container for displaying flash messages -->
+            {% for category, message in messages %}
+              <div class="alert {{ category }}">{{ message }}</div> <!-- Display each message with its category -->
+            {% endfor %}
           </div>
         
-      
+          <!-- Redirect after 2 seconds based on user role -->
           <script>
-              // Check the user role from the session and set the appropriate redirect URL
-              var userRole = '{{ session["role"] }}';  // Get the user role from the session
-              var redirectUrl;
-  
-              // Decide the URL based on the user's role
-              if (userRole === 'STAFF' || userRole === 'SUPERVISOR') {
-                  redirectUrl = "{{ url_for('admin_dashboard') }}";  // Redirect to the admin dashboard
-              } else {
-                  redirectUrl = "{{ url_for('main') }}";  // Redirect to the main page for regular users
-              }
-  
-              // Redirect after 2 seconds
-              setTimeout(function() {
-                  window.location.href = redirectUrl;
-              }, 2000);  // 2000ms = 2 seconds
+            var userRole = '{{ session["role"] }}';  // Get the user role from session
+            var redirectUrl;
+
+            // Determine the redirect URL based on the role
+            if (userRole === 'STAFF' || userRole === 'SUPERVISOR') {
+                redirectUrl = "{{ url_for('admin_dashboard') }}";  // Redirect to admin dashboard for staff or supervisor
+            } else {
+                redirectUrl = "{{ url_for('main') }}";  // Redirect to main page for regular users
+            }
+
+            // Redirect after a delay
+            setTimeout(function() {
+                window.location.href = redirectUrl;
+            }, 2000);  // 2000ms = 2 seconds
           </script>
-      {% endif %}
-  {% endwith %}
-  
-
+        {% endif %}
+      {% endwith %}
     </form>
+
+    <!-- Back to Dashboard Button -->
     <div class="back-buttons-container">
-      <a href="javascript:void(0);" onclick="redirectToDashboard();" >Back to Dashboard</a>
+      <a href="javascript:void(0);" onclick="redirectToDashboard();">Back to Dashboard</a> <!-- Link to redirect to the appropriate dashboard -->
     </div>
-    
-    </div>
+  </div>
 
- 
-  
-  
+  <!-- JavaScript for redirecting user to the appropriate dashboard based on their role -->
+  <script>
+    function redirectToDashboard() {
+      var userRole = '{{ session["role"] }}';  // Get the user role from the session
+      var redirectUrl;
 
+      // Determine the redirect URL based on the role
+      if (userRole === 'STAFF' || userRole === 'SUPERVISOR') {
+        redirectUrl = "{{ url_for('admin_dashboard') }}";  // Redirect to admin dashboard for staff or supervisor
+      } else {
+        redirectUrl = "{{ url_for('main') }}";  // Redirect to the main page for regular users
+      }
 
-<script>
-  function redirectToDashboard() {
-    // Get the user role from the session
-    var userRole = '{{ session["role"] }}';
-
-    // Decide the redirect URL based on user role
-    var redirectUrl;
-
-    if (userRole === 'STAFF' || userRole === 'SUPERVISOR') {
-      redirectUrl = "{{ url_for('admin_dashboard') }}";  // Redirect to admin dashboard
-    } else {
-      redirectUrl = "{{ url_for('main') }}";  // Redirect to the main page for regular users
+      // Perform the redirection
+      window.location.href = redirectUrl;
     }
-
-    // Redirect to the appropriate page
-    window.location.href = redirectUrl;
-  }
-</script>
+  </script>
 
 </body>
 </html>
-
-

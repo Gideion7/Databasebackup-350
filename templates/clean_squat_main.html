@@ -1,50 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Find a Clean Squat!</title>
-<link rel="stylesheet" href="../static/css/styles.css">
+    <title>Find a Clean Squat!</title>
+    <!-- Link to external CSS stylesheet for page styling -->
+    <link rel="stylesheet" href="../static/css/styles.css">
 </head>
 <body>
 
+<!-- Main wrapper for the page -->
 <div class="main-wrapper">
 
-  <!-- Flash messages -->
+  <!-- Flash messages section: Displays messages that are flashed from Flask -->
   {% with messages = get_flashed_messages() %}
   {% if messages %}
+    <!-- Display the first flash message -->
     <div class="flash-message-main">
       {{ messages[0] }}
     </div>
   {% endif %}
   {% endwith %}
 
+  <!-- Main content container -->
   <div class="container">
+    <!-- Heading for the page -->
     <h1>Find a Clean Squat!</h1>
 
-    
+    <!-- Link to the 'Select a Building' page -->
+    <a href="/select_building">
+      <button>Select a Building</button>
+    </a>
+    <br>
+    <br>
 
-
-      <a href="/select_building">
-        <button>Select a Building</button>
-      </a>
-      <br>
-      <br>
-      <a href="/select_preferences">
+    <!-- Link to the 'Select Preferences' page -->
+    <a href="/select_preferences">
       <button>Select Preferences</button>
-      </a>
-      <br>
-      <br>
-      <a href="/results">
+    </a>
+    <br>
+    <br>
+
+    <!-- Link to the 'Find a Restroom' page -->
+    <a href="/results">
       <button>Find a Restroom</button>
-      </a>
-      <br>
-      <br>
-      <a href="/report_an_issue">
+    </a>
+    <br>
+    <br>
+
+    <!-- Link to the 'Report an Issue' page -->
+    <a href="/report_an_issue">
       <button>Report an Issue</button>
-      </a>
-      <br>
-      <br>
-      <a href="{{ url_for('logout') }}">Logout</a>
+    </a>
+    <br>
+    <br>
+
+    <!-- Link to log out the user -->
+    <a href="{{ url_for('logout') }}">Logout</a>
   </div>
 </div>
+
 </body>
 </html>

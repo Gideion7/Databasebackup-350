@@ -4,30 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="../static/css/styles.css"> <!-- Link to the external CSS file -->
 </head>
 <body>
 
+    <!-- Main container for the login form -->
     <div class="form-container">
+        <!-- Heading of the page -->
         <h1>Welcome to Clean Squat</h1>
         
         <!-- Login Form -->
-        <form action="{{ url_for('login') }}" method="POST">
-            <!-- Username -->
+        <form action="{{ url_for('login') }}" method="POST"> <!-- POST method to submit the form -->
+            
+            <!-- Username input field -->
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" placeholder="Enter your username" required><br>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required><br> <!-- 'required' ensures the field cannot be left blank -->
 
-            <!-- Password -->
+            <!-- Password input field -->
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" placeholder="Enter your password" required><br>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required><br> <!-- 'required' ensures the field cannot be left blank -->
 
-            <!-- Submit Button -->
+            <!-- Submit Button for logging in -->
             <button type="submit">Login</button>
+
+            <!-- Flash message section to display success or error messages -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     <div class="flash-messages">
                         {% for category, message in messages %}
-                            <div class="flash-message {{ category }}">{{ message }}</div>
+                            <div class="flash-message {{ category }}">{{ message }}</div> <!-- Displaying messages with categories like 'success', 'error' -->
                         {% endfor %}
                     </div>
                 {% endif %}
@@ -35,6 +40,7 @@
         
         </form>
 
+        <!-- Link to the registration page if the user does not have an account -->
         <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
 
     </div>

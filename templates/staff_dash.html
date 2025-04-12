@@ -4,14 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Staff Dashboard</title>
-  <!-- Link to the staff_dash.css file -->
+  <!-- Link to the external stylesheet for styling -->
   <link rel="stylesheet" href="../static/css/styles.css">
 </head>
 <body>
 
   <div class="form-container">
+    <!-- Heading for the Staff Dashboard page -->
     <h1>Staff Dashboard</h1>
 
+    <!-- Form to display the action buttons -->
     <form action="#" method="post">
       <!-- Report Cleaning Button -->
       <a href="{{ url_for('report_cleaning') }}">
@@ -24,14 +26,17 @@
         <button type="button">Issue Portal</button>
       </a>
       <br><br>
+
+      <!-- Back to Main Dashboard Button -->
       <a href="{{ url_for('admin_dashboard') }}">
         <button type="button">Back to Main Dashboard</button>
       </a>
       <br><br>
-      <!-- Logout Button -->
-      <a href="{{ url_for('logout') }}">Logout</a>
-      <!-- <a href="{{ url_for('index') }}">Logout</a> -->
-      <!-- <p>Flask URL Test: {{ url_for('index') }}</p> -->
+
+      <!-- Logout Link -->
+      <a href="{{ url_for('logout') }}">
+        <button type="button">Logout</button>
+      </a>
     </form>
   </div>
 

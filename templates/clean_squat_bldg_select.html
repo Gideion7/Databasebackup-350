@@ -1,45 +1,58 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buildings</title>
+    <!-- Link to external CSS stylesheet for page styling -->
     <link rel="stylesheet" href="../static/css/styles.css">
 </head>
 <body>
+    <!-- Main form container -->
     <div class="form-container">
+        <!-- Heading for the page -->
         <h1>Buildings</h1>
+
+        <!-- Form for selecting a building -->
         <form action="{{ url_for('select_building') }}" method="post">
             <label for="building">Select Building:</label>
+            <!-- Dropdown for selecting a building -->
             <select id="building" name="building">
+                <!-- Loop through the buildings passed to the template and display each one as an option -->
                 {% for building in buildings %}
                 <option value="{{ building[0] }}">{{ building[1] }}</option>
-                {% endfor %} 
+                {% endfor %}
             </select>
+            <!-- Submit button for the form -->
             <button type="submit">Select Building</button>
         </form>
 
-        <!-- Display Flash message -->
+        <!-- Display Flash message if any exists -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
+                <!-- Container to hold any flashed messages -->
                 <div class="alert-container">
                     {% for category, message in messages %}
+                        <!-- Loop through all messages and display them with the appropriate category -->
                         <div class="alert {{ category }}">
                             {{ message }}
                         </div>
                     {% endfor %}
                 </div>
 
-                <!-- Redirect script after 2 seconds -->
+                <!-- Redirect script that will redirect the user based on their role after 2 seconds -->
                 <script>
                     setTimeout(function() {
                         var userRole = '{{ session["role"] }}'; // Get user role from session
                         if (userRole === 'STAFF' || userRole === 'SUPERVISOR') {
-                            window.location.href = '{{ url_for("admin_dashboard") }}';  // Redirect to admin dashboard
+                            // Redirect to admin dashboard for staff or supervisor
+                            window.location.href = '{{ url_for("admin_dashboard") }}';
                         } else {
-                            window.location.href = '{{ url_for("main") }}';  // Redirect to the main page for normal users
+                            // Redirect to the main page for normal users
+                            window.location.href = '{{ url_for("main") }}';
                         }
-                    }, 1000);  // Wait for 2 seconds before redirecting
+                    }, 1000);  // Wait for 1 second before redirecting
                 </script>
             {% endif %}
         {% endwith %}

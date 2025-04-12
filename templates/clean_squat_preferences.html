@@ -5,21 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restroom Preferences</title>
     <link rel="stylesheet" href="../static/css/styles.css">
+    
+    <!-- JavaScript to control the form behavior -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const typeSelect = document.getElementById("type");
             const genderSelect = document.getElementById("gender");
 
+            // Function to enable/disable gender dropdown based on restroom type selection
             function toggleGenderDropdown() {
                 if (typeSelect.value === "private") {
-                    genderSelect.disabled = true;
+                    genderSelect.disabled = true;  // Disable gender dropdown if private restroom is selected
                     genderSelect.value = ""; // Clear gender if private
                 } else {
-                    genderSelect.disabled = false;
+                    genderSelect.disabled = false;  // Enable gender dropdown for public restrooms
                 }
             }
 
-            // Run on page load and when the dropdown changes
+            // Run the toggle function on page load and when the type dropdown changes
             toggleGenderDropdown();
             typeSelect.addEventListener("change", toggleGenderDropdown);
         });
@@ -29,10 +32,9 @@
     <div class="form-container">
         <h1>Restroom Preferences</h1>
 
-        
-
+        <!-- Form for selecting restroom preferences -->
         <form action="{{ url_for('select_preferences') }}" method="POST">
-            <!-- Type Dropdown -->
+            <!-- Type Dropdown: User selects the type of restroom -->
             <label for="type">Type:</label>
             <select id="type" name="type">
                 <option value="">-- Select Type --</option>
@@ -40,7 +42,7 @@
                 <option value="private">Private</option>
             </select>
             
-            <!-- Gender Selection -->
+            <!-- Gender Selection: User selects gender for the restroom (only enabled for public restrooms) -->
             <label for="gender">Gender:</label>
             <select id="gender" name="gender">
                 <option value="">-- Select Gender --</option>
@@ -48,10 +50,11 @@
                 <option value="female">Female</option>
             </select>
             
-            <!-- Done Button -->
+            <!-- Done Button: Submit the form -->
             <button type="submit">Done</button>
         </form>
-        <!-- Display Flash message -->
+
+        <!-- Display Flash message section if there are any messages from Flask -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <div class="alert-container">
@@ -62,16 +65,17 @@
                     {% endfor %}
                 </div>
 
-                <!-- Redirect script after 2 seconds -->
+                <!-- JavaScript to redirect the user after 2 seconds -->
                 <script>
                     setTimeout(function() {
                         var userRole = '{{ session["role"] }}'; // Get user role from session
+                        // Redirect based on the user's role
                         if (userRole === 'STAFF' || userRole === 'SUPERVISOR') {
                             window.location.href = '{{ url_for("admin_dashboard") }}';  // Redirect to admin dashboard
                         } else {
-                            window.location.href = '{{ url_for("main") }}';  // Redirect to the main page for normal users
+                            window.location.href = '{{ url_for("main") }}';  // Redirect to the main page for regular users
                         }
-                    }, 1000);  // Wait for 2 seconds before redirecting
+                    }, 1000);  // Wait for 1 seconds before redirecting
                 </script>
             {% endif %}
         {% endwith %}

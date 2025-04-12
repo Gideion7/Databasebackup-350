@@ -1,42 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Star Rating</title>
-  <link rel="stylesheet" href="../static/css/rating.css">
+  <meta charset="UTF-8"> <!-- Character encoding for the document -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensures responsiveness on different devices -->
+  <title>Star Rating</title> <!-- Title for the page -->
+  <link rel="stylesheet" href="../static/css/rating.css"> <!-- Link to external stylesheet for styling -->
 </head>
 <body>
   
-  <!-- Display flash messages -->
+  <!-- Flash Messages Section -->
   <div class="flash-messages">
+    <!-- Loop to display flash messages -->
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <div class="flash-message">
-          {{ messages[0] }}
+          {{ messages[0] }} <!-- Display the first flash message -->
         </div>
       {% endif %}
     {% endwith %}
   </div>
 
+  <!-- Rating Form -->
   <form action="{{ url_for('rating') }}" method="POST">
-    <!-- Hidden input to store the RestroomID -->
+    <!-- Hidden input to store the RestroomID (if needed) -->
     <!-- <input type="hidden" name="restroom_id" value="{{ restroom_id }}"> -->
+    
+    <!-- Star Rating Inputs -->
     <div class="rating">
+      <!-- Radio buttons for each rating (1 to 5 stars) -->
       <input type="radio" id="star5" name="rating" value="5">
       <label for="star5"></label>
+
       <input type="radio" id="star4" name="rating" value="4">
       <label for="star4"></label>
+
       <input type="radio" id="star3" name="rating" value="3">
       <label for="star3"></label>
+
       <input type="radio" id="star2" name="rating" value="2">
       <label for="star2"></label>
+
       <input type="radio" id="star1" name="rating" value="1">
       <label for="star1"></label>
     </div>
 
+    <!-- Submit Button -->
     <button type="submit" id="submitBtn">Submit</button>
-</form>
+  </form>
+
+  <!-- Section to display the rating result (if applicable) -->
   <div id="ratingResult"></div>
+
 </body>
 </html>

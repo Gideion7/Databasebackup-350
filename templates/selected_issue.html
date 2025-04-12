@@ -1,43 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Issue Report</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <meta charset="UTF-8"> <!-- Character encoding for the document -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensures responsive design -->
+    <title>Issue Report</title> <!-- Title of the page -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}"> <!-- External stylesheet link -->
 </head>
 <body>
 
   <div class="form-container">
-    <h1>View Issue</h1>
+    <h1>View Issue</h1> <!-- Heading for the page -->
 
     <!-- Display Flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
-        <div class="alert alert-{{ messages[0][0] }}">
-          {{ messages[0][1] }}
+        <div class="alert alert-{{ messages[0][0] }}"> <!-- Display flash message with appropriate category -->
+          {{ messages[0][1] }} <!-- Display message content -->
         </div>
       {% endif %}
     {% endwith %}
 
+    <!-- Display Issue Details -->
     <div>
-      <p><strong>Issue ID:</strong> {{ issue[0] }}</p>
-      <p><strong>Description:</strong> {{ issue[1] }}</p>
+      <p><strong>Issue ID:</strong> {{ issue[0] }}</p> <!-- Display the issue ID -->
+      <p><strong>Description:</strong> {{ issue[1] }}</p> <!-- Display the issue description -->
       <p><strong>Status:</strong> 
-        {% if issue[2] %}
+        {% if issue[2] %} <!-- Check if the issue is completed or not -->
           Completed
         {% else %}
           Not Completed
         {% endif %}
       </p>
-      <p><strong>Building:</strong> {{ issue[3] }}</p>
-      <p><strong>Floor:</strong> {{ issue[4] }}</p>
-      <p><strong>Room:</strong> {{ issue[5] }}</p>
-      <p><strong>Timestamp:</strong> {{ issue[6] }}</p>
+      <p><strong>Building:</strong> {{ issue[3] }}</p> <!-- Display the building name -->
+      <p><strong>Floor:</strong> {{ issue[4] }}</p> <!-- Display the floor number -->
+      <p><strong>Room:</strong> {{ issue[5] }}</p> <!-- Display the room number -->
+      <p><strong>Timestamp:</strong> {{ issue[6] }}</p> <!-- Display the timestamp of the issue -->
     </div>
 
-    <!-- Form to update status -->
+    <!-- Form to update the issue status -->
     <form method="POST" action="{{ url_for('update_issue_status', issue_id=issue[0], status=(1 if not issue[2] else 0)) }}">
+      <!-- Button to toggle between marking the issue as completed or not -->
       <button type="submit">
         {% if issue[2] %}
           Mark as Not Completed
@@ -47,20 +49,20 @@
       </button>
     </form>
 
-    <!-- Button to go to the report cleaning form -->
+    <!-- Button to go to the report cleaning form with autofilled values -->
     <form method="GET" action="{{ url_for('report_cleaning') }}">
-      <input type="hidden" name="building_name" value="{{ issue[3] }}">
-      <input type="hidden" name="floor_number" value="{{ issue[4] }}">
-      <input type="hidden" name="room_number" value="{{ issue[5] }}">
-      <input type="hidden" name="timestamp" value="{{ issue[6] }}">
+      <input type="hidden" name="building_name" value="{{ issue[3] }}"> <!-- Hidden input for building name -->
+      <input type="hidden" name="floor_number" value="{{ issue[4] }}"> <!-- Hidden input for floor number -->
+      <input type="hidden" name="room_number" value="{{ issue[5] }}"> <!-- Hidden input for room number -->
+      <input type="hidden" name="timestamp" value="{{ issue[6] }}"> <!-- Hidden input for timestamp -->
 
-      <!-- Button in the 'View Issue' page that redirects to 'report_cleaning' with autofill -->
-<a href="{{ url_for('report_cleaning', building_name=issue[3], floor_number=issue[4], room_number=issue[5], timestamp=issue[6]) }}">
-  <button>Report Cleaning</button>
-</a>
-
+      <!-- Link to the report cleaning page with autofilled values from the issue -->
+      <a href="{{ url_for('report_cleaning', building_name=issue[3], floor_number=issue[4], room_number=issue[5], timestamp=issue[6]) }}">
+        <button>Report Cleaning</button> <!-- Button to go to the report cleaning form -->
+      </a>
     </form>
 
+    <!-- Back button to go back to the issue portal -->
     <a href="{{ url_for('staff_issue_portal') }}" class="btn btn-secondary mt-4">Back to Issue Portal</a>
   </div>
 

@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>List of Issues</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <meta charset="UTF-8"> <!-- Character encoding for the document -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensures responsiveness on different devices -->
+    <title>List of Issues</title> <!-- Title for the page -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}"> <!-- Link to external stylesheet -->
 </head>
 <body>
     <div class="form-container">
-        <h1>List of Reported Issues</h1>
+        <h1>List of Reported Issues</h1> <!-- Heading for the page -->
 
-        <table border="1">
+        <!-- Table for displaying the list of issues -->
+        <table border="1"> <!-- Border is added for visibility -->
             <thead>
                 <tr>
+                    <!-- Table headers for Issue ID, Description, Reported On, Status, and Action -->
                     <th>Issue ID</th>
                     <th>Description</th>
                     <th>Reported On</th>
@@ -21,12 +23,15 @@
                 </tr>
             </thead>
             <tbody>
+                <!-- Loop through the issues passed from the backend and display them in rows -->
                 {% for issue in issues %}
                 <tr>
-                    <td>{{ issue[0] }}</td>
-                    <td>{{ issue[1] }}</td>
-                    <td>{{ issue[2] }}</td>
-                    <td>{{ 'Completed' if issue[3] else 'Pending' }}</td>
+                    <!-- Display the issue details in respective columns -->
+                    <td>{{ issue[0] }}</td> <!-- Issue ID -->
+                    <td>{{ issue[1] }}</td> <!-- Issue Description -->
+                    <td>{{ issue[2] }}</td> <!-- Date/Time when the issue was reported -->
+                    <td>{{ 'Completed' if issue[3] else 'Pending' }}</td> <!-- Status: 'Completed' if the issue is resolved, else 'Pending' -->
+                    <!-- Action link to view the details of the selected issue -->
                     <td><a href="{{ url_for('selected_issue', issue_id=issue[0]) }}">View Issue</a></td>
                 </tr>
                 {% endfor %}

@@ -1,66 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report Cleaning</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-     
+    <meta charset="UTF-8"> <!-- Character encoding for the document -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensures responsiveness on different devices -->
+    <title>Report Cleaning</title> <!-- Title of the page -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}"> <!-- Link to external stylesheet -->
 </head>
 <body>
 
-  <div class="form-container">
-    <h1>Report Cleaning</h1>
+  <div class="form-container"> <!-- Container for the form -->
+    <h1>Report Cleaning</h1> <!-- Heading for the form -->
 
-    
     <!-- Cleaning report form -->
-    <form method="POST" action="{{ url_for('report_cleaning') }}">
+    <form method="POST" action="{{ url_for('report_cleaning') }}"> <!-- Form that sends data to the 'report_cleaning' route -->
+      
+      <!-- Building Selection Dropdown -->
       <label for="building_id">Building:</label>
-      <select name="building_id" required>
-        {% for building in buildings %}
+      <select name="building_id" required> <!-- Dropdown to select a building -->
+        {% for building in buildings %} <!-- Loop through buildings to populate the options -->
           <option value="{{ building[0] }}" {% if building[1] == building_name %} selected {% endif %}>{{ building[1] }}</option>
         {% endfor %}
       </select>
 
+      <!-- Floor Number Input -->
       <label for="floor">Floor:</label>
-      <input type="number" name="floor" value="{{ floor_number }}" required>
-
+      <input type="number" name="floor" value="{{ floor_number }}" required> <!-- Input field for floor number -->
+      
+      <!-- Room Number Input -->
       <label for="room">Room:</label>
-      <input type="text" name="room" value="{{ room_number }}" required>
+      <input type="text" name="room" value="{{ room_number }}" required> <!-- Input field for room number -->
 
+      <!-- Timestamp for the issue report -->
       <label for="timestamp">Issue Report Timestamp:</label>
       <input type="text" id="timestamp" name="timestamp" value="{{ timestamp }}" disabled> <!-- Display timestamp from issue report -->
       
+      <!-- Timestamp for the cleaning report -->
       <label for="timestamp">Cleaning Report Timestamp:</label>
-      <input type="datetime-local" name="timestamp" value="{{ timestamp }}" required>
-
+      <input type="datetime-local" name="timestamp" value="{{ timestamp }}" required> <!-- Input for cleaning report timestamp -->
+      
+      <!-- Submit Button for the form -->
       <button type="submit">Submit Cleaning Report</button>
+
+      <!-- Display Flash Messages -->
       {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
-        <div class="alert-container">
+        <div class="alert-container"> <!-- Container to display alert messages -->
           {% for category, message in messages %}
-            <div class="alert {{ category }}">{{ message }}</div>
+            <div class="alert {{ category }}">{{ message }}</div> <!-- Display each message with its category -->
           {% endfor %}
         </div>
         
+        <!-- Redirect after 2 seconds -->
         <script>
-          // Redirect to cleaning reports list after 2 seconds
           setTimeout(function() {
             window.location.href = "{{ url_for('cleaning_reports_list') }}";  // Redirect to cleaning reports list page
           }, 2000);  // 2000ms = 2 seconds
         </script>
       {% endif %}
-    {% endwith %}
+      {% endwith %}
     </form>
 
+    <!-- Back buttons for navigation -->
     <div class="back-buttons-container">
-      <a href="{{ url_for('cleaning_reports_list') }}" class="btn btn-secondary">Cleaning Reports</a>
-      <a href="{{ url_for('staff_dashboard') }}" class="btn btn-secondary">Staff Dashboard</a>
+      <a href="{{ url_for('cleaning_reports_list') }}" class="btn btn-secondary">Cleaning Reports</a> <!-- Link to cleaning reports list -->
+      <a href="{{ url_for('staff_dashboard') }}" class="btn btn-secondary">Staff Dashboard</a> <!-- Link to staff dashboard -->
     </div>
     
   </div>
-
-  
 
 </body>
 </html>

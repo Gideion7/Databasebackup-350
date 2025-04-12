@@ -1,39 +1,73 @@
 <!DOCTYPE html>
+<!-- 
+
+Description: 
+This file represents the HTML template for the admin dashboard. 
+It is used to display administrative controls and data visualization 
+for managing the database backup system.
+
+Usage: 
+Include this file in the project to render the admin dashboard interface.
+
+-->
 <html>
 <head>
-<title>Find a Clean Squat!</title>
-<link rel="stylesheet" href="../static/css/styles.css">
+    <title>Find a Clean Squat!</title>
+    <!-- Link to external CSS stylesheet for styling the page -->
+    <link rel="stylesheet" href="../static/css/styles.css">
 </head>
 <body>
 
+<!-- Main container for the page content -->
 <div class="container">
-  <h1>Find a Clean Squat!</h1>
-  <a href="/select_building">
-    <button>Select a Building</button>
-  </a>
-  <br>
-  <br>
-  <a href="/select_preferences">
-  <button>Select Preferences</button>
-  </a>
-  <br>
-  <br>
-  <a href="/results">
-  <button>Find a Restroom</button>
-  </a>
-  <br>
-  <br>
-  <a href="/report_an_issue">
-  <button>Report an Issue</button>
-  </a>
-  <br>
-  <br>
-  <a href="/staff_dashboard">
-  <button>Staff Dashboard</button>
-  </a>
-  <br>
-  <br>
-  <a href="{{ url_for('logout') }}">Logout</a>
+    <!-- Page title -->
+    <h1>Find a Clean Squat!</h1>
+
+    <!-- Link to select a building, leading to the 'select_building' page -->
+    <a href="/select_building">
+        <!-- Button to trigger building selection -->
+        <button>Select a Building</button>
+    </a>
+    <br>
+    <br>
+
+    <!-- Link to select preferences, leading to the 'select_preferences' page -->
+    <a href="/select_preferences">
+        <!-- Button to trigger preference selection -->
+        <button>Select Preferences</button>
+    </a>
+    <br>
+    <br>
+
+    <!-- Link to find a restroom, leading to the 'results' page -->
+    <a href="/results">
+        <!-- Button to find a restroom -->
+        <button>Find a Restroom</button>
+    </a>
+    <br>
+    <br>
+
+    <!-- Link to report an issue, leading to the 'report_an_issue' page -->
+    <a href="/report_an_issue">
+        <!-- Button to report a cleaning issue -->
+        <button>Report an Issue</button>
+    </a>
+    <br>
+    <br>
+
+    <!-- Link to the staff dashboard, leading to the 'staff_dashboard' page -->
+    <a href="/staff_dashboard">
+        <!-- Button for staff to access the staff dashboard -->
+        <button>Staff Dashboard</button>
+    </a>
+    <br>
+    <br>
+
+    <!-- Link to logout, calls the 'logout' function from Flask -->
+    <a href="{{ url_for('logout') }}">
+        <!-- Button to log out the user -->
+        <button>Logout</button>
+    </a>
 </div>
 
 </body>

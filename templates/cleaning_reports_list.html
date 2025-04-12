@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cleaning Report List</title>
     <style>
-        /* General Styles */
+        /* General Styles for the body */
         body {
             background-color: #002e5d; /* Dark blue background for the page */
             font-family: Arial, sans-serif;
@@ -17,7 +17,7 @@
             height: 100vh; /* Full viewport height */
         }
 
-        /* Container Styles */
+        /* Container styles for the content */
         .container {
             background-color: #003366; /* Dark blue background for the container */
             padding: 30px;
@@ -35,45 +35,48 @@
             margin-bottom: 20px;
         }
 
-        /* Style for the scrollable box */
+        /* Style for the scrollable box that holds the reports */
         .scroll-box {
             width: 100%;
-            max-height: 300px; /* Smaller height for the scroll box */
-            overflow-y: auto;
+            max-height: 300px; /* Limit the height of the scroll box */
+            overflow-y: auto; /* Enable vertical scrolling */
             border: 1px solid #ccc;
             padding: 10px;
             margin-bottom: 15px;
-            background-color: #2f3b52;
-            border-radius: 5px; /* Smaller border radius */
+            background-color: #2f3b52; /* Dark background for the box */
+            border-radius: 5px; /* Rounded corners */
         }
 
-        /* Style for report items */
+        /* Style for each report item */
         .report-item {
             padding: 10px;
-            border-bottom: 1px solid #444;
+            border-bottom: 1px solid #444; /* Separator between reports */
             margin-bottom: 5px;
-            background-color: #3e4b68;
+            background-color: #3e4b68; /* Dark background for report items */
             border-radius: 3px;
-            font-size: 12px;
+            font-size: 12px; /* Smaller font size for the report details */
         }
 
+        /* Remove the border-bottom for the last item */
         .report-item:last-child {
             border-bottom: none;
         }
 
+        /* Style for strong text (labels) in the report items */
         .report-item strong {
-            color: #ffeb3b;
+            color: #ffeb3b; /* Yellow color for the labels */
         }
 
+        /* Style for the report values (data) */
         .report-item span {
-            color: #a5d6a7;
+            color: #a5d6a7; /* Light green color for the report values */
         }
 
         /* Button styles */
         .btn {
             display: inline-block;
             padding: 10px 20px;
-            background-color: #F9BF3B; /* Yellow background */
+            background-color: #F9BF3B; /* Yellow background for buttons */
             color: white;
             text-decoration: none;
             border-radius: 5px;
@@ -92,11 +95,11 @@
         /* Back buttons container */
         .back-buttons-container {
             display: flex;
-            justify-content: space-between; /* Spread buttons out */
+            justify-content: space-between; /* Space between the buttons */
             gap: 10px; /* Optional: Add some space between the buttons */
             margin-top: 20px; /* Add some space from the previous element */
         }
-        
+
         /* Style for flash messages */
         .flash-messages {
             margin-top: 10px;
@@ -111,6 +114,7 @@
             font-size: 16px;
         }
 
+        /* Style for error, success, and warning messages */
         .flash-message.error {
             background-color: #e74c3c; /* Red background for error */
         }
@@ -130,6 +134,7 @@
     <div class="container">
         <h2>Cleaning Report List</h2>
 
+        <!-- Display the list of cleaning reports -->
         <div class="scroll-box">
             {% if cleaning_reports %}
                 {% for report in cleaning_reports %}
@@ -141,10 +146,11 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <p class="empty-message">No cleaning reports found.</p>
+                <p class="empty-message">No cleaning reports found.</p> <!-- Message if no reports are found -->
             {% endif %}
         </div>
 
+        <!-- Buttons for navigation -->
         <div class="back-buttons-container">
             <a href="{{ url_for('staff_dashboard') }}" class="btn">Staff Dashboard</a>
             <a href="{{ url_for('staff_issue_portal') }}" class="btn">Staff Issue Portal</a>

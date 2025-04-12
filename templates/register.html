@@ -1,42 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <link rel="stylesheet" href="../static/css/styles.css">
+    <meta charset="UTF-8"> <!-- Character encoding for the document -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensures responsiveness on different devices -->
+    <title>Register</title> <!-- Title for the page -->
+    <link rel="stylesheet" href="../static/css/styles.css"> <!-- Link to external stylesheet for styling -->
 </head>
 <body>
     
     <div class="form-container">
-        <h1>Register for Clean Squat</h1>
-
-       
+        <h1>Register for Clean Squat</h1> <!-- Heading for the registration form -->
 
         <!-- Registration Form -->
         <form action="{{ url_for('register') }}" method="POST">
-            <!-- Username -->
+            <!-- Username Input Field -->
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" placeholder="Enter your username" required><br>
 
-            <!-- Password -->
+            <!-- Password Input Field -->
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" placeholder="Enter your password" required><br>
 
-            <!-- First Name -->
+            <!-- First Name Input Field -->
             <label for="first_name">First Name:</label>
             <input type="text" id="first_name" name="first_name" placeholder="Enter your first name" required><br>
 
-            <!-- Last Name -->
+            <!-- Last Name Input Field -->
             <label for="last_name">Last Name:</label>
             <input type="text" id="last_name" name="last_name" placeholder="Enter your last name" required><br>
 
-            
             <!-- Submit Button -->
             <button type="submit">Register</button>
         </form>
 
+        <!-- Link to Login page if the user already has an account -->
         <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+
+        <!-- Display Flash Messages for errors or success -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <div class="flash-messages">
@@ -46,9 +46,6 @@
                 </div>
             {% endif %}
         {% endwith %}
-    </div>
-</body>
-</html>
     </div>
 </body>
 </html>

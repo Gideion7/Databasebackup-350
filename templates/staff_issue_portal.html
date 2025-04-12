@@ -187,6 +187,15 @@
   <div class="form-container">
     <h1>Staff Issue Portal</h1>
 
+    <!-- Flash Message Section to display messages from the server (like success messages) -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert alert-success">
+          {{ messages[0] }} <!-- Display the first flash message -->
+        </div>
+      {% endif %}
+    {% endwith %}
+
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         <div class="alert alert-{{ messages[0][0] }}">
@@ -194,7 +203,7 @@
         </div>
       {% endif %}
     {% endwith %}
-
+    
     <div class="scroll-box">
       <table>
         <thead>

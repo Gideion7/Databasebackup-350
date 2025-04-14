@@ -262,13 +262,16 @@ def admin_dashboard():
 
 
 # This route logs out the user by clearing all session data.
-@app.route("/logout")
+@app.route("/logout", methods=["GET", "POST"])
 def logout():
-    # Remove session variables and clear entire session
-    session.pop('user_id', None)
-    session.pop('username', None)
-    session.clear()
-    return redirect(url_for("index"))  # Redirect to login page after logout
+    try:
+        session.clear()  # Clear all session data
+        flash("You have been logged out.", "success")
+        return redirect(url_for("login"))  # Redirect to the login page after logout
+    except Exception as e:
+        flash(f"An error occurred: {str(e)}", "error")
+        return redirect(url_for("login"))  # Or redirect to a page of your choice
+
 
 # This route renders the main dashboard after login.
 # It serves as the homepage where users can search for restrooms or report issues.
